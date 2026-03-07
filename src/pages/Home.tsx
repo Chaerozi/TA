@@ -1,181 +1,277 @@
 import { useState } from "react";
-import LineWave from "../assets/beranda/Line.svg";
-import TagihIcon from "../assets/beranda/Tagih.svg";
-import VolumIcon from "../assets/beranda/Volum.svg";
+import { useNavigate } from "react-router-dom";
+import WaterChart from "../components/WaterChart";
+import AlertUsage from "../components/AlertUsage";
+import WaterChartBar from "../components/WaterChartBar";
 
-const BarChart = ({ data }: { data: { label: string; value: number }[] }) => {
-  const max = Math.max(...data.map((d) => d.value));
-
-  return (
-    <div className="flex items-end justify-between gap-4 h-56 pt-8 px-2 md:h-64 md:gap-6">
-      {data.map((item) => {
-        const height = (item.value / max) * 100;
-
-        return (
-          <div key={item.label} className="flex flex-col items-center gap-3 flex-1">
-            <div className="w-full h-44 md:h-52 flex items-end">
-              <div
-                className="w-full rounded-2xl"
-                style={{
-                  height: `${height}%`,
-                  background:
-                    "linear-gradient(180deg,#1F6FFF 0%, #0022FF 100%)",
-                }}
-              />
-            </div>
-            <span className="text-xs md:text-sm text-gray-500 font-medium">
-              {item.label}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+import Air from "../assets/beranda/Air.svg";
+import Meetran from "../assets/beranda/Meetran.svg";
+import Belumbayar from "../assets/beranda/Blumbayar.svg";
+import Wallet from "../assets/beranda/Wallet.svg";
+import Graph from "../assets/beranda/Graph.svg";
+import Line from "../assets/beranda/Line.svg";
+import Persen from "../assets/beranda/persen.svg";
 
 export default function Home() {
-  const [period, setPeriod] = useState("1 Bulan");
 
-  const weeklyData = [
-    { label: "Minggu 1", value: 75 },
-    { label: "Minggu 2", value: 45 },
-    { label: "Minggu 3", value: 38 },
-    { label: "Minggu 4", value: 90 },
-  ];
+  const navigate = useNavigate();
+  const [chartType, setChartType] = useState<"line" | "graph">("line");
+  const [activeTab, setActiveTab] = useState<"Harian" | "Mingguan" | "Bulanan">("Harian");
+
+  const isAnomaly = true; // simulasi dari backend
 
   return (
-    <div className="min-h-screen bg-[#EDEFF4] flex justify-center">
+    <div className="block md:hidden min-h-screen bg-[#F3F4F6] font-geist">
 
-      {/* MOBILE WRAPPER TETAP */}
-      <div className="w-[390px] md:w-full bg-[#F6F7FB] min-h-screen overflow-hidden">
+      {/* ================= HEADER ================= */}
+      <div className="bg-gradient-to-b from-[#0096FF] to-[#0022FF] px-5 pt-12 pb-32 text-white">
 
-        {/* ================= HEADER ================= */}
-        <div
-          className="relative px-6 pt-16 pb-28 md:pt-32 md:pb-36 text-center overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(180deg,#3EA6FF 0%,#1F6FFF 55%,#0022FF 100%)",
-          }}
-        >
-          <p className="text-white text-base md:text-lg font-medium mb-3">
-            Pemakaian Bulan Ini
-          </p>
+        {/* Greeting */}
+        <p className="text-[12px] opacity-80">
+          Halo selamat datang,
+        </p>
 
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <svg
-              className="w-4 md:w-5 h-4 md:h-5"
-              viewBox="0 0 24 24"
-              fill="rgba(255,255,255,0.85)"
-            >
-              <path d="M12 2C12 2 5 9.5 5 14a7 7 0 0014 0c0-4.5-7-12-7-12z" />
-            </svg>
-            <span className="text-sm md:text-base text-white/80">
-              Air Bersih
-            </span>
-          </div>
+        <div className="flex justify-between items-center mt-0">
 
-          <div className="flex justify-center items-start gap-1 mb-3">
-            <span className="text-white font-bold text-[56px] md:text-[72px] leading-none">
-              12.4
-            </span>
-            <span className="text-white text-xl md:text-2xl font-semibold mt-3 md:mt-4">
-              m³
-            </span>
-          </div>
+          <h1 className="text-[24px] font-semibold tracking-tight">
+            Ardhika 👋
+          </h1>
 
-          <div className="flex items-center justify-center gap-1.5 text-white/90 text-sm md:text-base">
-            <svg
-              className="w-4 md:w-5 h-4 md:h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-            +12% dari bulan lalu
-          </div>
+          {/* Meteran aktif */}
+          <div className="bg-white rounded-[14px] px-3 py-2 flex items-center gap-2 shadow-lg">
 
-          <img
-            src={LineWave}
-            alt="wave"
-            className="absolute bottom-0 left-0 w-full opacity-70"
-          />
-        </div>
+            <img src={Meetran} className="w-[22px] h-[22px]" />
 
-        {/* ================= BODY ================= */}
-        <div className="bg-[#F6F7FB] rounded-t-[28px] md:rounded-none px-5 md:px-20 pt-6 md:pt-16 pb-12 space-y-6 md:space-y-0">
+            <div>
+              <p className="text-green-600 text-[11px] font-semibold">
+                Meteran aktif
+              </p>
 
-          {/* DESKTOP GRID */}
-          <div className="md:grid md:grid-cols-2 md:gap-10">
-
-            {/* ================= TAGIHAN CARD ================= */}
-            <div className="bg-white rounded-3xl shadow-md p-6 md:p-8">
-              <div className="flex justify-between items-center mb-5">
-                <span className="text-gray-600 text-sm md:text-base font-medium">
-                  Tagihan kamu
-                </span>
-                <span className="bg-red-50 text-red-500 text-xs md:text-sm px-3 py-1 rounded-full font-medium">
-                  Belum Bayar
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4 md:gap-6 mb-6">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
-                  <img src={TagihIcon} className="w-7 h-7 md:w-8 md:h-8" />
-                </div>
-
-                <div>
-                  <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                    Rp 185.000
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Jatuh tempo pada 25 Januari 2026
-                  </p>
-                </div>
-              </div>
-
-              <button
-                className="w-full h-[52px] md:h-[56px] rounded-2xl text-white font-semibold text-[15px] md:text-base"
-                style={{
-                  background:
-                    "linear-gradient(180deg,#1F6FFF 0%,#0022FF 100%)",
-                }}
-              >
-                Bayar Tagihan
-              </button>
-            </div>
-
-            {/* ================= VOLUME CARD ================= */}
-            <div className="bg-white rounded-3xl shadow-md px-6 pt-6 pb-8 mt-6 md:mt-0 md:p-8">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <img src={VolumIcon} className="w-4 md:w-5 h-4 md:h-5" />
-                  <span className="text-gray-700 text-sm md:text-base font-medium">
-                    Volume pemakaian
-                  </span>
-                </div>
-
-                <button
-                  onClick={() =>
-                    setPeriod(period === "1 Bulan" ? "3 Bulan" : "1 Bulan")
-                  }
-                  className="border border-gray-200 text-sm md:text-base px-3 py-1.5 rounded-lg text-gray-600"
-                >
-                  {period}
-                </button>
-              </div>
-
-              <BarChart data={weeklyData} />
+              <p className="text-gray-400 text-[10px]">
+                Update 5 menit lalu
+              </p>
             </div>
 
           </div>
+
         </div>
+
+        {/* ALERT */}
+        {isAnomaly && <AlertUsage />}
+
+        {/* ===== CARDS ===== */}
+        <div className="flex gap-3 mt-6">
+
+          {/* Card Pemakaian */}
+<div className="bg-white rounded-[18px] p-4 flex-1 shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+
+  <div className="flex items-center gap-2 mb-3 h-[30px]">
+
+    <img src={Air} className="w-[30px] h-[30px]" />
+
+    <div className="flex items-center h-[22px] bg-blue-50 text-blue-600 rounded-[8px] px-[8px]">
+      <span className="text-[9px] font-semibold whitespace-nowrap">
+        Rata-rata 0.4 m³/hari
+      </span>
+    </div>
+
+  </div>
+
+  <p className="text-gray-400 text-[10px]">
+    Pemakaian Bulan Ini
+  </p>
+
+  <h2 className="text-[22px] font-bold mt-1 text-gray-900">
+    12.4 m³
+  </h2>
+
+  <p className="text-green-500 text-[10px] font-semibold mt-2">
+    ↑ 18% dari bulan lalu
+  </p>
+
+</div>
+
+         {/* Card Tagihan */}
+<div className="bg-white rounded-[18px] p-4 flex-1 shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+
+  <div className="flex items-center gap-2 mb-3 h-[30px]">
+
+    <img src={Belumbayar} className="w-[30px] h-[30px]" />
+
+    <div className="flex items-center h-[22px] bg-red-50 text-red-500 rounded-[8px] px-[8px]">
+      <span className="text-[9px] font-semibold whitespace-nowrap">
+        Belum dibayar
+      </span>
+    </div>
+
+  </div>
+
+  <p className="text-gray-400 text-[10px]">
+    Tagihan Berjalan
+  </p>
+
+  <h2 className="text-[22px] font-bold mt-1 text-gray-900">
+    Rp 185.000
+  </h2>
+
+  <p className="text-[10px] font-semibold text-gray-500 mt-2">
+    Jatuh tempo 25 Jan
+  </p>
+
+</div>
+
+        </div>
+
       </div>
+
+
+      {/* ================= SECTION BAWAH ================= */}
+      <div className="bg-[#F3F4F6] rounded-t-[28px] px-4 pt-6 pb-16 -mt-[96px]">
+
+        {/* Bayar Tagihan */}
+     
+  {/* Bayar Tagihan */}
+<button
+  onClick={() => navigate("/bayar-tagihan")}
+  className="w-full h-[40px] rounded-[14px] flex items-center justify-center gap-2 text-white text-[14px] font-medium"
+  style={{
+    background: "linear-gradient(180deg,#60A5FA 0%,#2563EB 100%)",
+    boxShadow: "0 10px 28px rgba(37,99,235,0.38)",
+  }}
+>
+  <img src={Wallet} className="w-[18px] h-[18px]" />
+  Bayar Tagihan
+</button>
+
+
+
+        {/* ===== CHART CONTAINER ===== */}
+<div className="mt-5 p-4">
+
+ {/* Tabs + Chart Switch */}
+<div className="w-full bg-[#F3F4F6] border border-[#E5E7EB] rounded-[16px] p-[6px] flex items-center justify-between">
+
+  {/* Tabs */}
+  <div className="flex items-center gap-[10px]">
+
+    {(["Harian","Mingguan","Bulanan"] as const).map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`
+          h-[30px]
+          px-[12px]
+          text-[12px]
+          font-medium
+          rounded-[6px]
+          flex items-center justify-center
+          transition-all
+          ${
+            activeTab === tab
+              ? "bg-[#D0E7FF] border border-[#3B82F6] text-black"
+              : "text-gray-400"
+          }
+        `}
+      >
+        {tab}
+      </button>
+    ))}
+
+  </div>
+
+
+  {/* Chart Switch */}
+  <div className="flex items-center gap-1 bg-[#E5E7EB] rounded-[10px] p-[3px]">
+
+    {/* Line */}
+    <button
+      onClick={() => setChartType("line")}
+      className={`w-[30px] h-[30px] flex items-center justify-center rounded-[8px]
+      ${chartType === "line"
+        ? "bg-gradient-to-b from-[#0096FF] to-[#0022FF] shadow-md"
+        : ""}`}
+    >
+      <img
+        src={Line}
+        className={`w-[16px]
+        ${chartType === "line"
+          ? "brightness-0 invert"
+          : "opacity-40"}`}
+      />
+    </button>
+
+
+    {/* Graph */}
+    <button
+      onClick={() => setChartType("graph")}
+      className={`w-[30px] h-[30px] flex items-center justify-center rounded-[8px]
+      ${chartType === "graph"
+        ? "bg-gradient-to-b from-[#0096FF] to-[#0022FF] shadow-md"
+        : ""}`}
+    >
+      <img
+        src={Graph}
+        className={`w-[16px]
+        ${chartType === "graph"
+          ? "brightness-0 invert"
+          : "opacity-40"}`}
+      />
+    </button>
+
+  </div>
+
+</div>
+
+
+          {/* Usage Stats */}
+          <div className="mt-5">
+
+            <p className="text-[12px] text-gray-400">
+              Pemakaian Air Bersih
+            </p>
+
+            <div className="flex items-center gap-3 mt-1">
+
+              <h2 className="text-[30px] font-bold text-gray-900">
+                12.4 m³
+              </h2>
+
+              <div className="flex items-center gap-1">
+
+                <span className="text-green-500 text-[12px] font-semibold">
+                  +12% dari bulan lalu
+                </span>
+
+                <img src={Persen} className="w-[14px]" />
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+  {/* Chart */}
+<div className="mt-8 -mx-4">
+
+  {activeTab === "Harian" && (
+    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+  )}
+
+  {activeTab === "Mingguan" && (
+    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+  )}
+
+  {activeTab === "Bulanan" && (
+    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+  )}
+
+</div>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }
