@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Gedung from "../assets/Login/Gedung.svg";
-import Logo from "../assets/Login/Logo.svg";
-import Water from "../assets/Login/Water.svg";
+import Gedung from "../../assets/Login/Gedung.svg";
+import Logo from "../../assets/Login/Logo.svg";
+import Water from "../../assets/Login/Water.svg";
 
 export default function Login() {
   const [remember, setRemember] = useState(false);

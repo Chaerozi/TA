@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import WaterChart from "../components/WaterChart";
-import AlertUsage from "../components/AlertUsage";
-import WaterChartBar from "../components/WaterChartBar";
+import WaterChart from "../../components/WaterChart";
+import AlertUsage from "../../components/AlertUsage";
+import WaterChartBar from "../../components/WaterChartBar";
 
-import Air from "../assets/beranda/Air.svg";
-import Meetran from "../assets/beranda/Meetran.svg";
-import Belumbayar from "../assets/beranda/Blumbayar.svg";
-import Wallet from "../assets/beranda/Wallet.svg";
-import Graph from "../assets/beranda/Graph.svg";
-import Line from "../assets/beranda/Line.svg";
-import Persen from "../assets/beranda/persen.svg";
+import Air from "../../assets/beranda/Air.svg";
+import Meetran from "../../assets/beranda/Meetran.svg";
+import Belumbayar from "../../assets/beranda/Blumbayar.svg";
+import Wallet from "../../assets/beranda/Wallet.svg";
+import Graph from "../../assets/beranda/Graph.svg";
+import Line from "../../assets/beranda/Line.svg";
+import Persen from "../../assets/beranda/persen.svg";
 
 export default function Home() {
 

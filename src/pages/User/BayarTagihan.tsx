@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-import Panah from "../assets/Tagihan/panah.svg";
-import BelumBayar from "../assets/beranda/Blumbayar.svg";
-import Wallet from "../assets/beranda/Wallet.svg";
-import Unduh from "../assets/Tagihan/Unduh.svg";
+import Panah from "../../assets/Tagihan/Panah.svg";
+import BelumBayar from "../../assets/beranda/Blumbayar.svg";
+import Wallet from "../../assets/beranda/Wallet.svg";
+import Unduh from "../../assets/Tagihan/Unduh.svg";
 
 export default function BayarTagihan() {
 
@@ -120,7 +120,98 @@ export default function BayarTagihan() {
         Unduh Invoice
       </button>
       </div>
+{/* ================= RIWAYAT TAGIHAN ================= */}
+<div className="mt-6 bg-white rounded-[18px] p-5 shadow-sm">
 
+  {/* Title */}
+  <div className="mb-4">
+    <h2 className="text-[16px] font-semibold text-gray-900">
+      Riwayat Tagihan
+    </h2>
+
+    <p className="text-[12px] text-gray-400">
+      3 bulan terakhir
+    </p>
+  </div>
+
+
+  {/* Header Table */}
+  <div className="grid grid-cols-4 text-[11px] text-gray-400 font-semibold border-b pb-2 mb-2">
+
+    <p>PERIODE</p>
+    <p>VOLUME</p>
+    <p>TOTAL TAGIHAN</p>
+    <p>TANGGAL BAYAR</p>
+
+  </div>
+
+
+  {/* Row 1 */}
+  <div className="grid grid-cols-4 text-[13px] py-3 border-b">
+
+    <p className="text-gray-700">
+      Desember 2025
+    </p>
+
+    <p className="text-gray-500">
+      11.8 m³
+    </p>
+
+    <p className="font-semibold text-gray-800">
+      Rp 175.000
+    </p>
+
+    <p className="text-gray-500">
+      20 Des 2025
+    </p>
+
+  </div>
+
+
+  {/* Row 2 */}
+  <div className="grid grid-cols-4 text-[13px] py-3 border-b">
+
+    <p className="text-gray-700">
+      November 2025
+    </p>
+
+    <p className="text-gray-500">
+      9.8 m³
+    </p>
+
+    <p className="font-semibold text-gray-800">
+      Rp 148.000
+    </p>
+
+    <p className="text-gray-500">
+      19 Nov 2025
+    </p>
+
+  </div>
+
+
+  {/* Row 3 */}
+  <div className="grid grid-cols-4 text-[13px] py-3">
+
+    <p className="text-gray-700">
+      Oktober 2025
+    </p>
+
+    <p className="text-gray-500">
+      11.5 m³
+    </p>
+
+    <p className="font-semibold text-gray-800">
+      Rp 171.000
+    </p>
+
+    <p className="text-gray-500">
+      22 Okt 2025
+    </p>
+
+  </div>
+
+</div>
     </div>
   );
 }
