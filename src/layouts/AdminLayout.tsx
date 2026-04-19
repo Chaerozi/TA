@@ -66,7 +66,7 @@ export default function AdminLayout() {
         className={`
           fixed lg:relative z-50 lg:z-auto
           ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          ${collapsed ? "w-[72px]" : "w-[220px]"}
+          ${collapsed ? "w-[72px]" : "w-[280px]"}
           bg-white py-5 flex flex-col border-r border-gray-100 shrink-0
           transition-all duration-300 h-full
         `}
@@ -99,7 +99,7 @@ export default function AdminLayout() {
           <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Menu</p>
         )}
 
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           <NavItem to="/admin"            icon={dashboardIcon}  label="Dashboard"  collapsed={collapsed} />
           <NavItem to="/admin/monitoring" icon={monitoringIcon} label="Monitoring" collapsed={collapsed} />
           <NavItem to="/admin/billing"    icon={billingIcon}    label="Billing"    collapsed={collapsed} />
@@ -281,14 +281,14 @@ function NavItem({
       className={({ isActive }) =>
         `flex items-center ${
           collapsed ? "justify-center px-0" : "gap-2 px-2"
-        } h-[40px] rounded-[12px] text-[13px] font-medium transition ${
+        } h-[40px] rounded-[12px] text-[16px] font-medium transition ${
           isActive
             ? "bg-gray-100 text-gray-900"
             : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
         }`
       }
     >
-      <img src={icon} className="w-4 shrink-0" />
+      <img src={icon} className="w-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
     </NavLink>
   )

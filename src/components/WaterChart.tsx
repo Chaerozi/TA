@@ -5,66 +5,134 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
-  ReferenceLine,
   Area,
 } from "recharts";
+import { useMemo } from "react";
 
-const data = [
-  { day: "Sen", value: 24, bars: [4,6,5,7,6] },
-  { day: "Sel", value: 28, bars: [6,7,8,7,9] },
-  { day: "Rab", value: 32, bars: [8,9,10,11,10] },
-  { day: "Kam", value: 35, bars: [10,12,14,11,9] },
-  { day: "Jum", value: 18, bars: [8,6,7,6,5] },
-  { day: "Sab", value: 30, bars: [7,9,10,11,12] },
-  { day: "Ming", value: 50, bars: [10,12,13,15,16] },
-];
-
-// flatten histogram bars
-const histogram = data.flatMap((d, i) =>
-  d.bars.map((b, j) => ({
-    day: d.day,
-    x: i + j * 0.15,
-    value: d.value,
-    bar: b,
-  }))
-);
-
-const CustomDot = ({ cx, cy, payload }: any) => {
-  if (payload.day === "Ming") {
-    return <circle cx={cx} cy={cy} r={5} fill="#2563EB" />;
-  }
-  return null;
+type ChartRange = "Harian" | "Mingguan" | "Bulanan";
+type ChartDatum = {
+  x: string;
+  value: number;
+  bar: number;
 };
 
-const LabelBox = ({ viewBox }: any) => {
+type IndexedChartDatum = ChartDatum & {
+  idx: number;
+};
+
+const DATA_BY_RANGE: Record<ChartRange, ChartDatum[]> = {
+  Harian: [
+    { x: "00:00", value: 8, bar: 4 },
+    { x: "03:00", value: 6, bar: 3 },
+    { x: "06:00", value: 11, bar: 5 },
+    { x: "09:00", value: 18, bar: 7 },
+    { x: "12:00", value: 14, bar: 6 },
+    { x: "15:00", value: 20, bar: 8 },
+    { x: "18:00", value: 26, bar: 9 },
+    { x: "21:00", value: 16, bar: 6 },
+  ],
+  Mingguan: [
+    { x: "Sen", value: 24, bar: 7 },
+    { x: "Sel", value: 28, bar: 8 },
+    { x: "Rab", value: 32, bar: 9 },
+    { x: "Kam", value: 35, bar: 10 },
+    { x: "Jum", value: 18, bar: 6 },
+    { x: "Sab", value: 30, bar: 9 },
+    { x: "Ming", value: 50, bar: 12 },
+  ],
+  Bulanan: [
+    { x: "M1", value: 32, bar: 9 },
+    { x: "M2", value: 28, bar: 8 },
+    { x: "M3", value: 36, bar: 11 },
+    { x: "M4", value: 30, bar: 10 },
+  ],
+};
+
+function LabelBox({ viewBox, value }: { viewBox?: { x: number; y: number }; value: number }) {
   if (!viewBox) return null;
   const { x, y } = viewBox;
+  const safeY = Math.max(y, 34);
 
   return (
     <g>
-      <rect x={x - 26} y={y - 30} width="52" height="22" rx="6" fill="#EF4444" />
+      <rect x={x - 26} y={safeY - 30} width="52" height="22" rx="6" fill="#EF4444" />
       <text
         x={x}
-        y={y - 16}
+        y={safeY - 16}
         fill="#fff"
         fontSize="11"
         fontWeight="600"
         textAnchor="middle"
       >
-        4.4 m³
+        {`${value.toFixed(1)} m³`}
       </text>
     </g>
   );
+}
+
+function ActiveIndicator({
+  cx,
+  cy,
+  value,
+}: {
+  cx?: number;
+  cy?: number;
+  value?: number;
+}) {
+  if (typeof cx !== "number" || typeof cy !== "number" || typeof value !== "number") {
+    return null;
+  }
+
+  const safeLabelY = Math.max(cy - 42, 8);
+
+  return (
+    <g>
+      <line
+        x1={cx}
+        x2={cx}
+        y1={24}
+        y2={1000}
+        stroke="#EF4444"
+        strokeDasharray="4 4"
+        strokeWidth={1.5}
+      />
+      <rect x={cx - 26} y={safeLabelY} width="52" height="22" rx="6" fill="#EF4444" />
+      <text
+        x={cx}
+        y={safeLabelY + 14}
+        fill="#fff"
+        fontSize="11"
+        fontWeight="600"
+        textAnchor="middle"
+      >
+        {`${value.toFixed(1)} m³`}
+      </text>
+      <circle cx={cx} cy={cy} r={6} fill="#2563EB" stroke="#EFF6FF" strokeWidth={2} />
+    </g>
+  );
+}
+
+type WaterChartProps = {
+  range: ChartRange;
 };
 
-export default function WaterChart() {
+export default function WaterChart({ range }: WaterChartProps) {
+  const baseData = DATA_BY_RANGE[range];
+  const data = useMemo<IndexedChartDatum[]>(
+    () => baseData.map((item, idx) => ({ ...item, idx })),
+    [baseData]
+  );
+
+  const maxValue = Math.max(...data.map((item) => item.value));
+  const yMax = Math.ceil((maxValue + 5) / 10) * 10;
+
   return (
-    <div className="w-full h-[220px]">
+    <div className="w-full h-[240px]">
 
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
-          data={histogram}
-          margin={{ top: 35, right: 40, left: 0, bottom: 0 }}
+          data={data}
+          margin={{ top: 24, right: 0, left: 0, bottom: 0 }}
         >
 
           <defs>
@@ -78,7 +146,7 @@ export default function WaterChart() {
             dataKey="bar"
             fill="#9CA3AF"
             opacity={0.18}
-            barSize={3}
+            barSize={4}
           />
 
         {/* area gradient */}
@@ -98,42 +166,36 @@ export default function WaterChart() {
   strokeWidth={2.8}
   strokeLinecap="round"
   strokeLinejoin="round"
-  dot={<CustomDot />}
-  activeDot={false}
+  dot={false}
+  activeDot={<ActiveIndicator />}
   connectNulls
-/>
-
-          {/* red dashed line */}
-   <ReferenceLine
-  x={6}
-  stroke="#EF4444"
-  strokeDasharray="4 4"
-  strokeWidth={1.5}
-  label={<LabelBox />}
 />
 
           {/* DAYS */}
           <XAxis
-  dataKey="x"
-  axisLine={false}
-  tickLine={false}
-  tick={{ fontSize: 11, fill: "#9CA3AF" }}
-  tickFormatter={(value) => {
-    const days = ["Sen","Sel","Rab","Kam","Jum","Sab","Ming"];
-    const index = Math.round(value);
-    return days[index] || "";
-  }}
-/>
+            type="number"
+            dataKey="idx"
+            domain={[0, data.length - 1]}
+            ticks={data.map((item) => item.idx)}
+            tickFormatter={(value) => data[Number(value)]?.x ?? ""}
+            allowDecimals={false}
+            interval={0}
+            padding={{ left: 0, right: 0 }}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#9CA3AF" }}
+          />
 
           {/* NUMBERS */}
           <YAxis
             orientation="right"
-            domain={[0,50]}
-            ticks={[10,20,30,40,50]}
+            domain={[0, yMax]}
+            ticks={[10, 20, 30, 40, 50, 60].filter((tick) => tick <= yMax)}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize:11, fill:"#9CA3AF"}}
-            width={2}
+            tickMargin={6}
+            width={30}
           />
 
         </ComposedChart>

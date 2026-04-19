@@ -21,7 +21,8 @@ export default function Home() {
   const isAnomaly = true; // simulasi dari backend
 
   return (
-    <div className="block md:hidden min-h-screen bg-[#F3F4F6] font-geist">
+    <div className="min-h-screen bg-[#E5E7EB] font-geist md:py-6 md:px-4">
+      <div className="mx-auto w-full max-w-[430px] min-h-screen bg-[#F3F4F6] md:min-h-0 md:rounded-[24px] md:overflow-hidden md:shadow-[0_18px_40px_rgba(15,23,42,0.20)]">
 
       {/* ================= HEADER ================= */}
       <div className="bg-gradient-to-b from-[#0096FF] to-[#0022FF] px-5 pt-12 pb-32 text-white">
@@ -133,10 +134,12 @@ export default function Home() {
   {/* Bayar Tagihan */}
 <button
   onClick={() => navigate("/bayar-tagihan")}
-  className="w-full h-[40px] rounded-[14px] flex items-center justify-center gap-2 text-white text-[14px] font-medium"
+  className="w-full h-[40px] rounded-[34px] flex items-center justify-center gap-3 text-white text-[14px] font-medium"
   style={{
-    background: "linear-gradient(180deg,#60A5FA 0%,#2563EB 100%)",
-    boxShadow: "0 10px 28px rgba(37,99,235,0.38)",
+    background:
+      "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+    boxShadow:
+      "0px 4px 4px rgba(1, 101, 255, 0.2), inset 0px -4px 4px rgba(255, 255, 255, 0.2)",
   }}
 >
   <img src={Wallet} className="w-[18px] h-[18px]" />
@@ -146,7 +149,7 @@ export default function Home() {
 
 
         {/* ===== CHART CONTAINER ===== */}
-<div className="mt-5 p-4">
+      <div className="mt-5">
 
  {/* Tabs + Chart Switch */}
 <div className="w-full bg-[#F3F4F6] border border-[#E5E7EB] rounded-[16px] p-[6px] flex items-center justify-between">
@@ -252,18 +255,18 @@ export default function Home() {
 
 
   {/* Chart */}
-<div className="mt-8 -mx-4">
+<div className="mt-8">
 
   {activeTab === "Harian" && (
-    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+    chartType === "line" ? <WaterChart range={activeTab} /> : <WaterChartBar range={activeTab} />
   )}
 
   {activeTab === "Mingguan" && (
-    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+    chartType === "line" ? <WaterChart range={activeTab} /> : <WaterChartBar range={activeTab} />
   )}
 
   {activeTab === "Bulanan" && (
-    chartType === "line" ? <WaterChart /> : <WaterChartBar />
+    chartType === "line" ? <WaterChart range={activeTab} /> : <WaterChartBar range={activeTab} />
   )}
 
 </div>
@@ -272,6 +275,7 @@ export default function Home() {
 
       </div>
 
+      </div>
     </div>
   );
 }

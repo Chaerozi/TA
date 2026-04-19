@@ -7,23 +7,52 @@ import {
   Cell,
 } from "recharts";
 
-const data = [
-  { day: "Sen", value: 45 },
-  { day: "Sel", value: 32 },
-  { day: "Rab", value: 22 },
-  { day: "Kam", value: 28 },
-  { day: "Jum", value: 40 },
-  { day: "Sab", value: 42 },
-  { day: "Ming", value: 26 },
-];
+type ChartRange = "Harian" | "Mingguan" | "Bulanan";
+type ChartDatum = { x: string; value: number };
 
-export default function WaterChartBar() {
+const DATA_BY_RANGE: Record<ChartRange, ChartDatum[]> = {
+  Harian: [
+    { x: "00:00", value: 8 },
+    { x: "03:00", value: 6 },
+    { x: "06:00", value: 11 },
+    { x: "09:00", value: 18 },
+    { x: "12:00", value: 14 },
+    { x: "15:00", value: 20 },
+    { x: "18:00", value: 26 },
+    { x: "21:00", value: 16 },
+  ],
+  Mingguan: [
+    { x: "Sen", value: 45 },
+    { x: "Sel", value: 32 },
+    { x: "Rab", value: 22 },
+    { x: "Kam", value: 28 },
+    { x: "Jum", value: 40 },
+    { x: "Sab", value: 42 },
+    { x: "Ming", value: 26 },
+  ],
+  Bulanan: [
+    { x: "M1", value: 38 },
+    { x: "M2", value: 29 },
+    { x: "M3", value: 46 },
+    { x: "M4", value: 33 },
+  ],
+};
+
+type WaterChartBarProps = {
+  range: ChartRange;
+};
+
+export default function WaterChartBar({ range }: WaterChartBarProps) {
+  const data = DATA_BY_RANGE[range];
+  const maxValue = Math.max(...data.map((item) => item.value));
+  const yMax = Math.ceil((maxValue + 5) / 10) * 10;
+
   return (
-    <div className="w-full h-[220px] mt-4">
+    <div className="w-full h-[240px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
-          margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
+          margin={{ top: 24, right: 0, left: 0, bottom: 0 }}
           barCategoryGap="22%"
         >
 
@@ -39,16 +68,17 @@ export default function WaterChartBar() {
           <Bar
             dataKey="value"
             radius={[10, 10, 10, 10]}
-            barSize={34}
+            barSize={range === "Harian" ? 20 : 34}
           >
-            {data.map((entry, index) => (
+            {data.map((_, index) => (
               <Cell key={index} fill="url(#barGradient)" />
             ))}
           </Bar>
 
           {/* Days */}
           <XAxis
-            dataKey="day"
+            dataKey="x"
+            padding={{ left: 0, right: 0 }}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#9CA3AF" }}
@@ -57,12 +87,13 @@ export default function WaterChartBar() {
           {/* Numbers */}
           <YAxis
             orientation="right"
-            domain={[0, 50]}
-            ticks={[10, 20, 30, 40, 50]}
+            domain={[0, yMax]}
+            ticks={[10, 20, 30, 40, 50, 60].filter((tick) => tick <= yMax)}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#9CA3AF" }}
-            width={35}
+            tickMargin={6}
+            width={30}
           />
 
         </BarChart>
