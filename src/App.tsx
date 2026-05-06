@@ -4,11 +4,16 @@ import { Routes, Route } from "react-router-dom"
 import Login from "./pages/User/Login"
 import Home from "./pages/User/Home"
 import BayarTagihan from "./pages/User/BayarTagihan"
+import MetodePembayaran from "./pages/User/MetodePembayaran"
+import Payment from "./pages/User/Payment"
+import PaymentSuccess from "./pages/User/PaymentSuccess"
 import ActivateAccount from "./components/ActivateAccount"
 
 // ADMIN
 import Dashboard from "./pages/Admin/Dashbord"
 import AdminLayout from "./layouts/AdminLayout"
+import Monitoring from "./pages/Admin/Monitoring"
+import Billing from "./pages/Admin/Billing"
 
 export default function App() {
   return (
@@ -19,10 +24,15 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/bayar-tagihan" element={<BayarTagihan />} />
-
+      <Route path="/metode-pembayaran" element={<MetodePembayaran />} />
+      <Route path="/qris-payment" element={<Payment />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
       {/* ADMIN */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="monitoring" element={<Monitoring />} />
+        <Route path="billing" element={<Billing />} />
+
       </Route>
 
     </Routes>

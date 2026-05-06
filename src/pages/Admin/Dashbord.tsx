@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import {
   ComposedChart,
-  LineChart,
   Line,
   Area,
   XAxis,
