@@ -276,20 +276,31 @@ function NavItem({
 }) {
   return (
     <NavLink
-      to={to}
-      end={to === "/admin"}
-      className={({ isActive }) =>
-        `flex items-center ${
-          collapsed ? "justify-center px-0" : "gap-2 px-2"
-        } h-[40px] rounded-[12px] text-[16px] font-medium transition ${
-          isActive
-            ? "bg-gray-100 text-gray-900"
-            : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-        }`
-      }
+  to={to}
+  end={to === "/admin"}
+>
+  {({ isActive }) => (
+    <div
+      className={`flex items-center ${
+        collapsed ? "justify-center px-0" : "gap-2 px-2"
+      } h-[40px] rounded-[12px] text-[16px] font-medium transition ${
+        isActive
+          ? "bg-gray-100 text-gray-900"
+          : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+      }`}
     >
-      <img src={icon} className="w-5 shrink-0" />
+     <img
+  src={icon}
+  className={`w-5 shrink-0 transition ${
+    isActive
+      ? "brightness-0 saturate-100 opacity-100"
+      : "opacity-40"
+  }`}
+/>
+
       {!collapsed && <span className="truncate">{label}</span>}
-    </NavLink>
+    </div>
+  )}
+</NavLink>
   )
 }

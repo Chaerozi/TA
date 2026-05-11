@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import Gedung from "../../assets/Login/Gedung.svg";
 import Logo from "../../assets/Login/Logo.svg";
@@ -8,10 +9,71 @@ import Water from "../../assets/Login/Water.svg";
 export default function Login() {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+const [popup, setPopup] = useState<{
+  open: boolean;
+  message: string;
+  type: "success" | "error";
+}>({
+  open: false,
+  message: "",
+  type: "success",
+});
+
+const handleLogin = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/auth/login",
+      {
+        email,
+        password,
+      }
+    );
+
+    // simpan token login
+    localStorage.setItem(
+      "token",
+      response.data.data.token
+    );
+
+    // simpan data user
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.data.user)
+    );
+
+    setPopup({
+      open: true,
+      message: "Login berhasil",
+      type: "success",
+    });
+
+  } catch (error: any) {
+    setPopup({
+      open: true,
+      message:
+        error.response?.data?.message ||
+        "Login gagal",
+      type: "error",
+    });
+  }
+};
+
+const handleClosePopup = () => {
+  const isSuccess = popup.type === "success";
+
+  setPopup({
+    open: false,
+    message: "",
+    type: "success",
+  });
+
+  if (isSuccess) {
     navigate("/home");
-  };
+  }
+};
 
   return (
     <>
@@ -65,6 +127,8 @@ export default function Login() {
 
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukan email"
               className="w-full h-[44px] px-3 rounded-[12px] border border-[#CBD5E1]"
             />
@@ -77,8 +141,10 @@ export default function Login() {
             </label>
 
             <input
-              type="password"
-              placeholder="Masukan kata sandi"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Masukan kata sandi"
               className="w-full h-[44px] px-3 rounded-[12px] border border-[#CBD5E1]"
             />
           </div>
@@ -127,6 +193,53 @@ export default function Login() {
 
         </div>
       </div>
+      {/* ================= POPUP ================= */}
+{popup.open && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="w-[90%] max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden">
+
+      {/* HEADER */}
+      <div
+        className={`px-6 py-5 text-white ${
+          popup.type === "success"
+            ? "bg-gradient-to-r from-[#0096FF] to-[#0022FF]"
+            : "bg-gradient-to-r from-red-500 to-rose-600"
+        }`}
+      >
+        <h2 className="text-2xl font-bold">
+          {popup.type === "success"
+            ? "Berhasil"
+            : "Terjadi Kesalahan"}
+        </h2>
+
+        <p className="text-sm opacity-80 mt-1">
+          AQUORA System Notification
+        </p>
+      </div>
+
+      {/* CONTENT */}
+      <div className="px-6 py-8">
+        <p className="text-gray-700 text-base leading-relaxed">
+          {popup.message}
+        </p>
+
+        <button
+          onClick={handleClosePopup}
+          className="mt-8 w-full rounded-2xl py-3 text-white font-semibold transition-all duration-200 active:scale-[0.98]"
+          style={{
+            background:
+              "linear-gradient(to right, #0096FF, #0022FF)",
+            boxShadow:
+              "0 8px 20px rgba(0,34,255,0.25)",
+          }}
+        >
+          OK
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:flex min-h-screen bg-[#F3F4F6] font-geist">
@@ -160,6 +273,8 @@ export default function Login() {
               </label>
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukan email"
                 className="w-full h-[52px] px-5 rounded-[12px]
                 border border-[#CBD5E1]
@@ -175,6 +290,8 @@ export default function Login() {
               </label>
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukan kata sandi"
                 className="w-full h-[52px] px-5 rounded-[12px]
                 border border-[#CBD5E1]

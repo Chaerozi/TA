@@ -20,7 +20,12 @@ export default function App() {
     <Routes>
 
       {/* USER */}
-      <Route path="/" element={<ActivateAccount />} />
+     <Route path="/" element={<Login />} />
+
+<Route
+  path="/activate-account"
+  element={<ActivateAccount />}
+/>
       <Route path="/login" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/bayar-tagihan" element={<BayarTagihan />} />

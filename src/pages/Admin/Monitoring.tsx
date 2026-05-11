@@ -67,8 +67,8 @@ export default function Monitoring() {
   }, [search, statusFilter, paymentFilter])
 
   return (
-    <div className="min-h-screen bg-[#EEF1F6] p-8">
-      <div className="max-w-[900px] mx-auto">
+    <div className="min-h-screen bg-[#F5F7FB] p-8">
+        <div className="w-full max-w-[1380px] mx-auto">
 
         {/* ── FILTER ROW ── */}
         <div className="flex items-center gap-3 mb-4">
