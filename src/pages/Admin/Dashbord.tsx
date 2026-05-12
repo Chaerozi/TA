@@ -180,7 +180,13 @@ function TambahUserModal({
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full h-[48px] rounded-[14px] text-white text-[14px] font-semibold bg-gradient-to-r from-[#0096FF] via-[#60A5FA] to-[#0022FF] shadow-[0_8px_20px_rgba(37,99,235,0.35)] active:scale-[0.97] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full h-[48px] text-white text-[14px] font-semibold active:scale-[0.97] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            style={{
+              borderRadius: "34px",
+              border: "1px solid #70B9FF",
+              background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+              boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+            }}
           >
             {loading ? (
               <>
@@ -238,7 +244,13 @@ function SuccessModal({
 
         <button
           onClick={onClose}
-          className="w-full h-[48px] rounded-[14px] text-white text-[14px] font-semibold bg-gradient-to-r from-[#0096FF] via-[#60A5FA] to-[#0022FF] shadow-[0_8px_20px_rgba(37,99,235,0.35)] active:scale-[0.97] transition-all"
+          className="w-full h-[48px] text-white text-[14px] font-semibold active:scale-[0.97] transition-all"
+          style={{
+            borderRadius: "34px",
+            border: "1px solid #70B9FF",
+            background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+            boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+          }}
         >
           Selesai
         </button>
@@ -297,7 +309,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="h-[40px] px-4 rounded-[12px] bg-white border border-gray-200 text-gray-700 text-[14px] font-medium flex items-center gap-2 hover:bg-gray-50 transition shadow-sm">
+          <button className="h-[40px] px-4 bg-white border border-gray-200 text-gray-700 text-[14px] font-medium flex items-center gap-2 hover:bg-gray-50 transition shadow-sm" style={{ borderRadius: "34px" }}>
             <div className="w-[26px] h-[26px] bg-white rounded-[8px] flex items-center justify-center">
               <img src={kelolaIcon} className="w-4" />
             </div>
@@ -306,7 +318,13 @@ export default function Dashboard() {
 
           <button
             onClick={() => setOpenModal(true)}
-            className="h-[40px] px-4 rounded-[14px] text-white text-[14px] font-semibold bg-gradient-to-r from-[#0096FF] via-[#60A5FA] to-[#0022FF] shadow-[0_6px_18px_rgba(0,34,255,0.35)] hover:shadow-[0_8px_24px_rgba(0,34,255,0.5)] active:scale-[0.97] transition-all flex items-center gap-1.5"
+            className="h-[40px] px-4 text-white text-[14px] font-semibold active:scale-[0.97] transition-all flex items-center gap-1.5"
+            style={{
+              borderRadius: "34px",
+              border: "1px solid #70B9FF",
+              background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+              boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+            }}
           >
             <span className="text-[16px] font-light">+</span>
             Tambah User
@@ -475,6 +493,20 @@ export default function Dashboard() {
 
         {/* RIGHT */}
         <div className="flex flex-col gap-[12px] w-full lg:w-[365px]">
+          <div
+            className="rounded-[12px] p-[20px] flex flex-col gap-[10px] relative overflow-hidden"
+            style={{ height: "171px", background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.35)" }}
+          >
+            <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
+            <p className="text-[14px] font-semibold text-white relative z-10">Smart Alerts</p>
+            <div className="bg-blue-400/50 rounded-[10px] h-[44px] flex items-center justify-center relative z-10">
+              <p className="text-[13px] text-white font-medium">3 anomali terdeteksi hari ini</p>
+            </div>
+            <button className="w-full h-[44px] bg-white rounded-[999px] text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition active:scale-[0.98] relative z-10">
+              Lihat detail
+            </button>
+          </div>
+
           <div className="bg-white rounded-[12px] p-[20px] border border-slate-200 flex flex-col gap-[10px]" style={{ height: "427px" }}>
             <h3 className="text-[14px] font-semibold text-gray-700 text-center">Sebaran Status Pembayaran</h3>
             <div className="flex items-center justify-center flex-1">
@@ -506,20 +538,6 @@ export default function Dashboard() {
                 <span className="text-[12px] text-gray-500">Belum bayar</span>
               </div>
             </div>
-          </div>
-
-          <div
-            className="rounded-[12px] p-[20px] flex flex-col gap-[10px] relative overflow-hidden"
-            style={{ height: "171px", background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.35)" }}
-          >
-            <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
-            <p className="text-[14px] font-semibold text-white relative z-10">Smart Alerts</p>
-            <div className="bg-blue-400/50 rounded-[10px] h-[44px] flex items-center justify-center relative z-10">
-              <p className="text-[13px] text-white font-medium">3 anomali terdeteksi hari ini</p>
-            </div>
-            <button className="w-full h-[44px] bg-white rounded-[999px] text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition active:scale-[0.98] relative z-10">
-              Lihat detail
-            </button>
           </div>
         </div>
       </div>

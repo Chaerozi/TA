@@ -44,14 +44,16 @@ export default function MetodePembayaran() {
   ]
 
   return (
-    <div className="max-w-[420px] mx-auto min-h-screen bg-[#F5F6FA] flex flex-col">
+    <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
+      <div className="w-full max-w-[430px] min-h-screen bg-[#F5F6FA] shadow-sm relative flex flex-col">
 
       {/* ================= HEADER ================= */}
       <div className="flex items-center justify-between px-4 py-8 bg-white shadow-sm">
 
        <button
         onClick={() => navigate(-1)}
-        className="w-[36px] h-[36px] rounded-[10px] bg-white flex items-center justify-center shadow-sm"
+        className="w-[36px] h-[36px] bg-white flex items-center justify-center shadow-sm"
+        style={{ borderRadius: "34px" }}
       >
         <img src={Panah} className="w-[29px] h-[29px]" />
       </button>
@@ -145,10 +147,12 @@ export default function MetodePembayaran() {
     navigate("/payment-success") // untuk metode lain (simulasi)
   }
 }}
-           className="w-full h-[40px] rounded-[14px] flex items-center justify-center gap-2 text-white text-[14px] font-medium"
+           className="w-full h-[40px] flex items-center justify-center gap-2 text-white text-[14px] font-medium"
   style={{
-    background: "linear-gradient(180deg,#60A5FA 0%,#2563EB 100%)",
-    boxShadow: "0 10px 28px rgba(37,99,235,0.38)",
+    borderRadius: "34px",
+    border: "1px solid #70B9FF",
+    background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+    boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
   }}
 >
 
@@ -156,6 +160,7 @@ export default function MetodePembayaran() {
           Bayar Tagihan
         </button>
 
+      </div>
       </div>
     </div>
   )

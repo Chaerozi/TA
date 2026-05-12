@@ -10,70 +10,70 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("");
 
-const [popup, setPopup] = useState<{
-  open: boolean;
-  message: string;
-  type: "success" | "error";
-}>({
-  open: false,
-  message: "",
-  type: "success",
-});
-
-const handleLogin = async () => {
-  try {
-    const response = await axios.post(
-      "http://localhost:3000/api/v1/auth/login",
-      {
-        email,
-        password,
-      }
-    );
-
-    // simpan token login
-    localStorage.setItem(
-      "token",
-      response.data.data.token
-    );
-
-    // simpan data user
-    localStorage.setItem(
-      "user",
-      JSON.stringify(response.data.data.user)
-    );
-
-    setPopup({
-      open: true,
-      message: "Login berhasil",
-      type: "success",
-    });
-
-  } catch (error: any) {
-    setPopup({
-      open: true,
-      message:
-        error.response?.data?.message ||
-        "Login gagal",
-      type: "error",
-    });
-  }
-};
-
-const handleClosePopup = () => {
-  const isSuccess = popup.type === "success";
-
-  setPopup({
+  const [popup, setPopup] = useState<{
+    open: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     open: false,
     message: "",
     type: "success",
   });
 
-  if (isSuccess) {
-    navigate("/home");
-  }
-};
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      // simpan token login
+      localStorage.setItem(
+        "token",
+        response.data.data.token
+      );
+
+      // simpan data user
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.data.user)
+      );
+
+      setPopup({
+        open: true,
+        message: "Login berhasil",
+        type: "success",
+      });
+
+    } catch (error: any) {
+      setPopup({
+        open: true,
+        message:
+          error.response?.data?.message ||
+          "Login gagal",
+        type: "error",
+      });
+    }
+  };
+
+  const handleClosePopup = () => {
+    const isSuccess = popup.type === "success";
+
+    setPopup({
+      open: false,
+      message: "",
+      type: "success",
+    });
+
+    if (isSuccess) {
+      navigate("/home");
+    }
+  };
 
   return (
     <>
@@ -141,10 +141,10 @@ const handleClosePopup = () => {
             </label>
 
             <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Masukan kata sandi"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Masukan kata sandi"
               className="w-full h-[44px] px-3 rounded-[12px] border border-[#CBD5E1]"
             />
           </div>
@@ -172,13 +172,16 @@ const handleClosePopup = () => {
             onClick={handleLogin}
             className="
               w-full h-[48px]
-              rounded-[14px]
               text-white text-[15px] font-medium
-              bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#3B82F6]
-              shadow-[0_8px_20px_rgba(37,99,235,0.35)]
               active:scale-[0.97]
               transition-all
             "
+            style={{
+              borderRadius: "34px",
+              border: "1px solid #70B9FF",
+              background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+              boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+            }}
           >
             Masuk
           </button>
@@ -194,52 +197,51 @@ const handleClosePopup = () => {
         </div>
       </div>
       {/* ================= POPUP ================= */}
-{popup.open && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div className="w-[90%] max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden">
+      {popup.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-[90%] max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden">
 
-      {/* HEADER */}
-      <div
-        className={`px-6 py-5 text-white ${
-          popup.type === "success"
-            ? "bg-gradient-to-r from-[#0096FF] to-[#0022FF]"
-            : "bg-gradient-to-r from-red-500 to-rose-600"
-        }`}
-      >
-        <h2 className="text-2xl font-bold">
-          {popup.type === "success"
-            ? "Berhasil"
-            : "Terjadi Kesalahan"}
-        </h2>
+            {/* HEADER */}
+            <div
+              className={`px-6 py-5 text-white ${popup.type === "success"
+                  ? "bg-gradient-to-r from-[#0096FF] to-[#0022FF]"
+                  : "bg-gradient-to-r from-red-500 to-rose-600"
+                }`}
+            >
+              <h2 className="text-2xl font-bold">
+                {popup.type === "success"
+                  ? "Berhasil"
+                  : "Terjadi Kesalahan"}
+              </h2>
 
-        <p className="text-sm opacity-80 mt-1">
-          AQUORA System Notification
-        </p>
-      </div>
+              <p className="text-sm opacity-80 mt-1">
+                AQUORA System Notification
+              </p>
+            </div>
 
-      {/* CONTENT */}
-      <div className="px-6 py-8">
-        <p className="text-gray-700 text-base leading-relaxed">
-          {popup.message}
-        </p>
+            {/* CONTENT */}
+            <div className="px-6 py-8">
+              <p className="text-gray-700 text-base leading-relaxed">
+                {popup.message}
+              </p>
 
-        <button
-          onClick={handleClosePopup}
-          className="mt-8 w-full rounded-2xl py-3 text-white font-semibold transition-all duration-200 active:scale-[0.98]"
-          style={{
-            background:
-              "linear-gradient(to right, #0096FF, #0022FF)",
-            boxShadow:
-              "0 8px 20px rgba(0,34,255,0.25)",
-          }}
-        >
-          OK
-        </button>
-      </div>
+              <button
+                onClick={handleClosePopup}
+                className="mt-8 w-full rounded-2xl py-3 text-white font-semibold transition-all duration-200 active:scale-[0.98]"
+                style={{
+                  background:
+                    "linear-gradient(to right, #0096FF, #0022FF)",
+                  boxShadow:
+                    "0 8px 20px rgba(0,34,255,0.25)",
+                }}
+              >
+                OK
+              </button>
+            </div>
 
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:flex min-h-screen bg-[#F3F4F6] font-geist">
@@ -325,15 +327,16 @@ const handleClosePopup = () => {
               onClick={handleLogin}
               className="
                 w-full h-[56px]
-                rounded-[14px]
                 text-white text-[20px] font-medium
-                bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#3B82F6]
-                shadow-[0_8px_20px_rgba(37,99,235,0.35)]
-                hover:shadow-[0_10px_25px_rgba(37,99,235,0.45)]
-                hover:brightness-105
                 active:scale-[0.98]
                 transition-all duration-300
               "
+              style={{
+                borderRadius: "34px",
+                border: "1px solid #70B9FF",
+                background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+                boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+              }}
             >
               Masuk
             </button>
@@ -365,7 +368,7 @@ const handleClosePopup = () => {
 
           <div className="absolute top-40 left-16 max-w-[560px]">
             <p className="text-white text-[24px] leading-[32px] font-medium">
-              Aquora membantu kamu memantau penggunaan air secara real-time dan 
+              Aquora membantu kamu memantau penggunaan air secara real-time dan
               membayar tagihan dengan lebih transparan dan praktis.
             </p>
           </div>

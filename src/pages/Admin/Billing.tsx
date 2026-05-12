@@ -373,13 +373,17 @@ export default function Billing() {
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => setDetailModal(null)}
-                className="flex-1 h-[48px] rounded-[12px] border border-gray-200 text-[13px] font-semibold text-gray-600 hover:bg-gray-50 transition active:scale-[0.97]"
+                className="flex-1 h-[48px] border border-gray-200 text-[13px] font-semibold text-gray-600 hover:bg-gray-50 transition active:scale-[0.97]"
+                style={{ borderRadius: "34px" }}
               >
                 Tutup
               </button>
               <button
-                className="flex-1 h-[48px] rounded-[12px] text-white text-[13px] font-semibold shadow-md active:scale-[0.97] transition-transform"
-                style={grad}
+                className="flex-1 h-[48px] text-white text-[13px] font-semibold shadow-md active:scale-[0.97] transition-transform"
+                style={{
+                  ...grad,
+                  borderRadius: "34px",
+                }}
                 onClick={() => alert(`Kirim reminder ke ${detailModal.penghuni}`)}
               >
                 Kirim Reminder

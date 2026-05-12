@@ -21,8 +21,8 @@ export default function Home() {
   const isAnomaly = true; // simulasi dari backend
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB] font-geist md:py-6 md:px-4">
-      <div className="mx-auto w-full max-w-[430px] min-h-screen bg-[#F3F4F6] md:min-h-0 md:rounded-[24px] md:overflow-hidden md:shadow-[0_18px_40px_rgba(15,23,42,0.20)]">
+    <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
+      <div className="w-full max-w-[430px] min-h-screen bg-[#F3F4F6] shadow-sm relative overflow-hidden">
 
       {/* ================= HEADER ================= */}
       <div className="bg-gradient-to-b from-[#0096FF] to-[#0022FF] px-5 pt-12 pb-32 text-white">
