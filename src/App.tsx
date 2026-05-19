@@ -1,5 +1,8 @@
 import { Routes, Route } from "react-router-dom"
 
+//Landing
+import LandingPage from "./pages/Landing/LandingPage"
+
 // USER
 import Login from "./pages/User/Login"
 import Home from "./pages/User/Home"
@@ -18,6 +21,8 @@ import Billing from "./pages/Admin/Billing"
 export default function App() {
   return (
     <Routes>
+
+      <Route path="/landing" element={<LandingPage />} />
 
       {/* USER */}
      <Route path="/" element={<Login />} />

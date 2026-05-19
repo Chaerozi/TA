@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import {
-  ComposedChart, Line, Area, XAxis, YAxis, Tooltip,
+  BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts"
 
@@ -10,171 +10,129 @@ import bulanIcon    from "../../assets/adminDasbord/Bulan.svg"
 import kelolaIcon   from "../../assets/adminDasbord/Kelola.svg"
 import smartIcon    from "../../assets/adminDasbord/Smart.svg"
 import succesIcon   from "../../assets/adminDasbord/Berhasil.svg"
+import notifIcon    from "../../assets/adminDasbord/Lonceng.svg"
 
 /* ===================== DATA ===================== */
-const monthlyData: Record<string, { day: string; value: number }[]> = {
-  Januari:   Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 600 + Math.floor(Math.random() * 300) })),
-  Februari:  Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 620 + Math.floor(Math.random() * 280) })),
-  Maret:     Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 650 + Math.floor(Math.random() * 300) })),
-  April:     Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 700 + Math.floor(Math.random() * 250) })),
-  Mei:       Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 720 + Math.floor(Math.random() * 270) })),
-  Juni:      Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 710 + Math.floor(Math.random() * 260) })),
-  Juli:      Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 730 + Math.floor(Math.random() * 200) })),
-  Agustus:   Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 740 + Math.floor(Math.random() * 220) })),
-  September: Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 760 + Math.floor(Math.random() * 240) })),
-  Oktober:   Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 750 + Math.floor(Math.random() * 230) })),
-  November:  Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 730 + Math.floor(Math.random() * 210) })),
-  Desember:  Array.from({ length: 26 }, (_, i) => ({ day: String(i + 1), value: 720 + Math.floor(Math.random() * 200) })),
+const barData = {
+  "1 Bulan Terakhir": [
+    { month: "Jan", values: [10000, 3000, 1200, 100] },
+  ],
+  "3 Bulan Terakhir": [
+    { month: "Jan", values: [10000, 3000, 1200, 100] },
+    { month: "Feb", values: [10000, 1200, 600, 300] },
+    { month: "Mar", values: [900, 600, 1200, 3000] },
+  ],
+  "6 Bulan Terakhir": [
+    { month: "Jan", values: [10000, 3000, 1200, 100] },
+    { month: "Feb", values: [10000, 1200, 600, 300] },
+    { month: "Mar", values: [900, 600, 1200, 3000] },
+    { month: "Apr", values: [600, 900, 5200, 3000] },
+    { month: "May", values: [3000, 1200, 5200, 3000] },
+    { month: "Jun", values: [1200, 3000, 1000, 2800] },
+  ],
 }
-const MONTHS = Object.keys(monthlyData)
+
+const RANGE_OPTIONS = ["3 Bulan Terakhir", "6 Bulan Terakhir"] as const
+type RangeType = typeof RANGE_OPTIONS[number]
 
 const pieData = [
   { name: "Sudah bayar", value: 80 },
   { name: "Belum bayar", value: 20 },
 ]
-const COLORS = ["url(#donutGradient)", "#E5E7EB"]
 
 const allPaymentHistory = [
   { id: "567GH8",  pemakaian: "84.5 m³",  status: "Lunas",         tagihan: "IDR 49.000"  },
-  { id: "567GH9",  pemakaian: "92.0 m³",  status: "Belum Dibayar", tagihan: "IDR 99.000"  },
+  { id: "567GH8",  pemakaian: "84.5 m³",  status: "Belum Dibayar", tagihan: "IDR 99.000"  },
+  { id: "567GH8",  pemakaian: "84.5 m³",  status: "Lunas",         tagihan: "IDR 49.000"  },
+  { id: "567GH8",  pemakaian: "84.5 m³",  status: "Belum Dibayar", tagihan: "IDR 99.000"  },
+  { id: "567GH9",  pemakaian: "92.0 m³",  status: "Lunas",         tagihan: "IDR 99.000"  },
   { id: "567GH10", pemakaian: "78.3 m³",  status: "Lunas",         tagihan: "IDR 49.000"  },
-  { id: "567GH11", pemakaian: "110.1 m³", status: "Belum Dibayar", tagihan: "IDR 120.000" },
-  { id: "567GH12", pemakaian: "65.7 m³",  status: "Lunas",         tagihan: "IDR 40.000"  },
-  { id: "567GH13", pemakaian: "88.2 m³",  status: "Lunas",         tagihan: "IDR 55.000"  },
 ]
 
-// Unit list — nanti bisa diganti fetch dari API
 const UNIT_LIST = ["Unit A-10", "Unit A-11", "Unit A-12", "Unit B-01", "Unit B-02", "Unit C-05"]
-
 type FilterType = "All" | "Lunas" | "Belum Dibayar"
 
-/* ===================== MODAL TAMBAH USER ===================== */
-function TambahUserModal({
-  onClose,
-  onSuccess,
-}: {
-  onClose: () => void
-  onSuccess: (email: string) => void
-}) {
-  const [unit, setUnit]   = useState("")
-  const [email, setEmail] = useState("")
+/* ===================== CUSTOM ROUNDED BAR ===================== */
+function RoundedBar(props: any) {
+  const { x, y, height, fill } = props
+  if (!height || height <= 0) return null
+  return (
+    <rect x={x} y={y} width={36.06} height={height} rx={18} ry={18} fill={fill} />
+  )
+}
+
+/* ===================== CUSTOM TOOLTIP ===================== */
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-white border border-gray-100 rounded-[10px] shadow-lg px-3 py-2">
+      <p className="text-[11px] text-gray-400 mb-0.5">{label}</p>
+      <p className="text-[13px] font-semibold text-gray-800">
+        {payload[0].value.toLocaleString()} m³
+      </p>
+    </div>
+  )
+}
+
+/* ===================== TAMBAH USER MODAL ===================== */
+function TambahUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (email: string) => void }) {
+  const [unit, setUnit]       = useState("")
+  const [email, setEmail]     = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState("")
 
   const handleSubmit = async () => {
-  if (!unit) { setError("Pilih unit terlebih dahulu."); return }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    setError("Masukkan email yang valid.")
-    return
+    if (!unit)  { setError("Pilih unit terlebih dahulu."); return }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Masukkan email yang valid."); return }
+    setError(""); setLoading(true)
+    try {
+      const token = localStorage.getItem("token")
+      const res   = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ email, unit, name: "", role: "customer" }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.message || "Gagal menambahkan user."); setLoading(false); return }
+      onSuccess(email)
+    } catch { setError("Gagal terhubung ke server. Coba lagi."); setLoading(false) }
   }
 
-  setError("")
-  setLoading(true)
-
-  try {
-    const token = localStorage.getItem("token")
-
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        email,
-        unit,
-        name: "",
-        role: "customer",
-      }),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      setError(data.message || "Gagal menambahkan user.")
-      setLoading(false)
-      return
-    }
-
-    onSuccess(email)
-
-  } catch (err) {
-    // Ini yang muncul — biasanya CORS atau URL salah
-    setError("Gagal terhubung ke server. Coba lagi.")
-    setLoading(false)
-  }
-}
   return (
-    <div
-      className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-[999]"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black/25 backdrop-blur-[3px] flex items-center justify-center z-[999]" onClick={onClose}>
       <div
-        className="w-[500px] bg-white rounded-[20px] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] relative"
-        onClick={(e) => e.stopPropagation()}
+        className="w-[480px] bg-white rounded-[24px] p-7 shadow-[0_32px_80px_rgba(0,0,0,0.18)] relative"
+        onClick={e => e.stopPropagation()}
       >
-        {/* CLOSE */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition text-gray-500 text-[14px]"
-        >
-          ✕
-        </button>
-
-        <h2 className="text-[18px] font-bold text-gray-800 mb-1">Tambah User</h2>
-        <p className="text-[13px] text-gray-400 mb-5">
-          User akan menerima email untuk aktivasi akun dan membuat kata sandi.
-        </p>
-
+        <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition text-gray-500 text-[14px]">✕</button>
+        <h2 className="text-[20px] font-bold text-gray-900 mb-1">Tambah User</h2>
+       
         <div className="space-y-4">
-
-          {/* UNIT */}
           <div>
-            <label className="text-[13px] font-semibold text-gray-700 mb-1.5 block">
-              Pilih Unit
-            </label>
+            <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 tracking-wide block">Pilih Unit</label>
             <div className="relative">
-              <select
-                value={unit}
-                onChange={(e) => { setUnit(e.target.value); setError("") }}
-                className="w-full h-[46px] px-4 pr-10 rounded-[12px] border border-gray-200 text-[13px] text-gray-700 outline-none focus:border-blue-500 transition appearance-none bg-white cursor-pointer"
-              >
-                <option value="">-- Pilih unit --</option>
-                {UNIT_LIST.map((u) => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
+              <select value={unit} onChange={e => { setUnit(e.target.value); setError("") }}
+                className="w-full h-[48px] px-4 pr-10 rounded-[14px] border border-gray-200 text-[14px] text-gray-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition appearance-none bg-white cursor-pointer">
+                <option value="">Pilih unit</option>
+                {UNIT_LIST.map(u => <option key={u} value={u}>{u}</option>)}
               </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
+              <svg className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
             </div>
           </div>
-
-          {/* EMAIL */}
           <div>
-            <label className="text-[13px] font-semibold text-gray-700 mb-1.5 block">
-              Email Pengguna Baru
-            </label>
-            <input
-              type="email"
-              placeholder="contoh@email.com"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError("") }}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              className="w-full h-[46px] px-4 rounded-[12px] border border-gray-200 text-[13px] text-gray-700 outline-none focus:border-blue-500 transition placeholder:text-gray-400"
-            />
+            <label className="text-[12px] font-bold text-gray-600 uppercase tracking-wide mb-2 block">Email Pengguna Baru</label>
+            <input type="email" placeholder="Masukan email" value={email}
+              onChange={e => { setEmail(e.target.value); setError("") }}
+              onKeyDown={e => e.key === "Enter" && handleSubmit()}
+              className="w-full h-[48px] px-4 rounded-[14px] border border-gray-200 text-[14px] text-gray-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition placeholder:text-gray-300" />
           </div>
-
-          {/* ERROR */}
           {error && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-[10px] px-4 py-2.5">
-              <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4M12 16h.01" />
-              </svg>
+            <div className="flex items-center gap-2.5 bg-red-50 border border-red-100 rounded-[12px] px-4 py-3">
+              <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg>
               <p className="text-[12px] text-red-600">{error}</p>
             </div>
           )}
+<<<<<<< HEAD
 
           {/* SUBMIT */}
           <button
@@ -199,8 +157,15 @@ function TambahUserModal({
             ) : (
               "Tambah User & Kirim Email"
             )}
+=======
+          <button onClick={handleSubmit} disabled={loading}
+            className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.30)" }}>
+            {loading
+              ? (<><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" /><path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" /></svg>Mengirim...</>)
+              : "Tambah User & Kirim Email"}
+>>>>>>> 4f7171c (Update frontend UI)
           </button>
-
         </div>
       </div>
     </div>
@@ -208,39 +173,18 @@ function TambahUserModal({
 }
 
 /* ===================== SUCCESS MODAL ===================== */
-function SuccessModal({
-  email,
-  onClose,
-}: {
-  email: string
-  onClose: () => void
-}) {
+function SuccessModal({ email, onClose }: { email: string; onClose: () => void }) {
   return (
-    <div
-      className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-[999]"
-      onClick={onClose}
-    >
-      <div
-        className="w-[420px] bg-white rounded-[20px] p-7 text-center shadow-[0_24px_60px_rgba(0,0,0,0.15)]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-center mb-4">
-          <img src={succesIcon} className="w-[80px]" />
-        </div>
-
-        <h2 className="text-[18px] font-bold text-gray-800 mb-2">
-          Akun berhasil ditambahkan!
-        </h2>
-
-        <p className="text-[13px] text-gray-400 mb-1">
-          Email aktivasi telah dikirim ke:
-        </p>
-        <p className="text-[14px] font-semibold text-blue-600 mb-5 break-all">
-          {email}
-        </p>
-        <p className="text-[13px] text-gray-400 mb-6">
+    <div className="fixed inset-0 bg-black/25 backdrop-blur-[3px] flex items-center justify-center z-[999]" onClick={onClose}>
+      <div className="w-[400px] bg-white rounded-[24px] p-8 text-center shadow-[0_32px_80px_rgba(0,0,0,0.15)]" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-center mb-5"><img src={succesIcon} className="w-[72px]" /></div>
+        <h2 className="text-[20px] font-bold text-gray-900 mb-2">Akun berhasil ditambahkan!</h2>
+        <p className="text-[13px] text-gray-400 mb-1">Email aktivasi telah dikirim ke:</p>
+        <p className="text-[14px] font-semibold text-blue-600 mb-4 break-all">{email}</p>
+        <p className="text-[13px] text-gray-400 mb-7 leading-relaxed">
           Minta pengguna cek inbox-nya dan buat kata sandi untuk mengaktifkan akun.
         </p>
+<<<<<<< HEAD
 
         <button
           onClick={onClose}
@@ -252,6 +196,11 @@ function SuccessModal({
             boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
           }}
         >
+=======
+        <button onClick={onClose}
+          className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97]"
+          style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.25)" }}>
+>>>>>>> 4f7171c (Update frontend UI)
           Selesai
         </button>
       </div>
@@ -261,32 +210,37 @@ function SuccessModal({
 
 /* ===================== MAIN DASHBOARD ===================== */
 export default function Dashboard() {
-  const [selectedMonth, setSelectedMonth] = useState("Juli")
-  const [monthOpen, setMonthOpen]         = useState(false)
-  const monthRef  = useRef<HTMLDivElement>(null)
+  const [range, setRange] = useState<RangeType>("6 Bulan Terakhir")
+
+  const chartData = barData[range as keyof typeof barData].flatMap((item) => {
+    const highest = Math.max(...item.values)
+    return item.values.map((value, index) => ({
+      month: index === 0 ? item.month : "",
+      value,
+      active: value === highest,
+    }))
+  })
+
+  const [rangeOpen, setRangeOpen] = useState(false)
+  const rangeRef = useRef<HTMLDivElement>(null)
 
   const [paymentSearch, setPaymentSearch] = useState("")
   const [filterStatus, setFilterStatus]   = useState<FilterType>("All")
   const [filterOpen, setFilterOpen]       = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
 
-  const [selectedRow, setSelectedRow] = useState<number | null>(null)
-
-  // Modal state
   const [openModal, setOpenModal]       = useState(false)
   const [successModal, setSuccessModal] = useState(false)
   const [addedEmail, setAddedEmail]     = useState("")
 
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (monthRef.current  && !monthRef.current.contains(e.target as Node))  setMonthOpen(false)
+      if (rangeRef.current  && !rangeRef.current.contains(e.target as Node))  setRangeOpen(false)
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFilterOpen(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
   }, [])
-
-  const lineData = monthlyData[selectedMonth]
 
   const filteredPayments = allPaymentHistory.filter(row => {
     const matchSearch = row.id.toLowerCase().includes(paymentSearch.toLowerCase())
@@ -295,19 +249,22 @@ export default function Dashboard() {
   })
 
   return (
-    <div className="space-y-4 max-w-[1320px] mx-auto">
+    <div className="space-y-5 max-w-[1400px] mx-auto">
 
-      {/* HERO */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:h-[60px]">
-        <div>
-          <h1 className="text-[20px] font-semibold text-gray-800 leading-tight">
-            Pantau konsumsi & tagihan air secara real-time
-          </h1>
-          <p className="text-[14px] text-gray-400 mt-[2px]">
-            Lihat semua statistik dari pengguna dan laporannya
+      {/* ================= HEADER ================= */}
+      <div className="flex items-start justify-between gap-4">
+
+        {/* LEFT — title */}
+        <div className="w-[215px]">
+          <p className="text-[24px] leading-[33px] font-normal text-[#98A2B3] tracking-[-0.02em] capitalize">
+            Smart Water Meter
           </p>
+          <h1 className="text-[32px] leading-[33px] font-medium text-[#344054] tracking-[-0.03em] mt-[2px]">
+            Dashboard
+          </h1>
         </div>
 
+<<<<<<< HEAD
         <div className="flex items-center gap-3">
           <button className="h-[40px] px-4 bg-white border border-gray-200 text-gray-700 text-[14px] font-medium flex items-center gap-2 hover:bg-gray-50 transition shadow-sm" style={{ borderRadius: "34px" }}>
             <div className="w-[26px] h-[26px] bg-white rounded-[8px] flex items-center justify-center">
@@ -329,48 +286,87 @@ export default function Dashboard() {
             <span className="text-[16px] font-light">+</span>
             Tambah User
           </button>
+=======
+        {/* RIGHT — profile pill */}
+        <div className="w-[302px] h-[68px] rounded-full border border-[#EAECF0] bg-white px-[14px] flex items-center justify-between shadow-[0_1px_2px_rgba(16,24,40,0.05)] shrink-0">
+          <div className="flex items-center gap-[14px]">
+            <div className="w-[52px] h-[52px] rounded-full bg-[#F2F4F7] flex items-center justify-center">
+              <img src={notifIcon} className="w-[24px] h-[24px] opacity-60" />
+            </div>
+            <div className="flex flex-col justify-center">
+              <p className="text-[20px] leading-[22px] font-medium text-[#344054] tracking-[-0.02em] w-[126px]">
+                Hi, Admin
+              </p>
+              <p className="mt-[6px] text-[14px] leading-[22px] font-normal text-[#98A2B3] w-[128px]">
+                Welcome to Aquora
+              </p>
+            </div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-[18px] h-[18px] text-[#98A2B3] shrink-0">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+>>>>>>> 4f7171c (Update frontend UI)
         </div>
+
       </div>
 
-      {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Unit Aktif"      value="48"            desc="Dari 50 unit terdaftar" icon={totalIcon} />
-        <StatCard title="Konsumsi Hari Ini"     value="842.5 m³"      extra="+3.2%" extraType="green" icon={konsumsiIcon} />
-        <StatCard title="Konsumsi Bulan Ini"    value="18,320 m³"     extra="-1.8%" extraType="red"   icon={bulanIcon} />
-        <StatCard title="Tagihan Belum Dibayar" value="Rp 52.450.000" desc="8 unit menunggak"        icon={totalIcon} />
+      {/* ================= ACTION BUTTONS ================= */}
+      <div className="flex items-center gap-4">
+
+        {/* KELOLA HARGA AIR */}
+        <button className="w-[200px] h-[53px] rounded-[34px] bg-white border border-[#E4E7EC] flex items-center justify-center gap-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] hover:bg-gray-50 transition-all">
+          <img src={kelolaIcon} className="w-[18px] h-[18px] opacity-70" />
+          <span className="text-[14px] font-medium text-[#344054]">Kelola Harga Air</span>
+        </button>
+
+        {/* TAMBAH USER */}
+        <button
+          onClick={() => setOpenModal(true)}
+          className="w-[178px] h-[53px] rounded-[34px] flex items-center justify-center gap-3 text-white transition-all active:scale-[0.98] hover:shadow-[0_10px_30px_rgba(0,52,255,0.35)]"
+          style={{ background: "linear-gradient(90deg, #0034FF 0%, #3FACFF 100%)", boxShadow: "0 8px 24px rgba(0,52,255,0.25)" }}
+        >
+          <span className="text-[32px] leading-none font-light mb-[2px]">+</span>
+          <span className="text-[14px] font-medium tracking-[-0.01em]">Tambah User</span>
+        </button>
+
       </div>
 
-      {/* BOTTOM */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_365px] gap-4 items-start w-full">
+      {/* ================= STAT CARDS ================= */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-4 gap-4">
+        <StatCard title="Total Unit Aktif"      value="48"            subtext="Dari 50 unit terdaftar" icon={totalIcon} />
+        <StatCard title="Konsumsi Hari Ini"     value="842.5 m³"      badge="+3.2%"  badgeType="green" icon={konsumsiIcon} />
+        <StatCard title="Konsumsi Bulan Ini"    value="18,320 m³"     badge="-1.8%"  badgeType="red"   icon={bulanIcon} />
+        <StatCard title="Tagihan Belum Dibayar" value="Rp 52.450.000" subtext="8 unit menunggak"        icon={totalIcon} />
+      </div>
 
-        {/* LEFT */}
-        <div className="space-y-4 h-full">
+      {/* ================= MAIN GRID ================= */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_347px] gap-6 items-start">
 
-          {/* LINE CHART */}
-          <div className="w-full bg-white rounded-[12px] border border-slate-200 flex flex-col" style={{ height: "300px", padding: "20px", gap: "10px" }}>
-            <div className="flex justify-between items-center">
-              <h3 className="text-[14px] font-semibold text-gray-700">Volume pemakaian air</h3>
-              <div className="relative" ref={monthRef}>
+        {/* ===== LEFT COLUMN ===== */}
+        <div className="space-y-4 min-w-0">
+
+          {/* BAR CHART CARD */}
+          <div className="bg-white rounded-[20px] border border-gray-100 shadow-sm p-5 pr-">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-[15px] font-bold text-gray-800">Volume pemakaian air</h3>
+
+              {/* Range dropdown */}
+              <div className="relative" ref={rangeRef}>
                 <button
-                  onClick={() => setMonthOpen(!monthOpen)}
-                  className="flex items-center gap-1.5 text-[12px] text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[30px] rounded-[8px] transition"
+                  onClick={() => setRangeOpen(!rangeOpen)}
+                  className="flex items-center gap-2 text-[12px] font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[32px] rounded-[10px] transition"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
-                  {selectedMonth}
+                  {range}
                 </button>
-                {monthOpen && (
-                  <div className="absolute right-0 top-[36px] w-[140px] bg-white rounded-[12px] shadow-lg border border-gray-100 p-1.5 z-50 max-h-[260px] overflow-y-auto">
-                    {MONTHS.map(month => (
-                      <button
-                        key={month}
-                        onClick={() => { setSelectedMonth(month); setMonthOpen(false) }}
-                        className={`w-full text-left px-3 py-2 text-[12px] rounded-[8px] transition ${
-                          selectedMonth === month ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {month}
+                {rangeOpen && (
+                  <div className="absolute right-0 top-[38px] w-[180px] bg-white rounded-[14px] shadow-lg border border-gray-100 p-1.5 z-50">
+                    {RANGE_OPTIONS.map(r => (
+                      <button key={r} onClick={() => { setRange(r); setRangeOpen(false) }}
+                        className={`w-full text-left px-3 py-2.5 text-[12px] rounded-[10px] transition font-medium ${range === r ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}>
+                        {r}
                       </button>
                     ))}
                   </div>
@@ -378,69 +374,78 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-hidden">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={lineData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%"   stopColor="#3B82F6" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}    />
-                    </linearGradient>
-                    <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%"   stopColor="#0096FF" />
-                      <stop offset="100%" stopColor="#0022FF" />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fill: "#9CA3AF", fontSize: 11 }} />
-                  <YAxis domain={[0, 1000]} ticks={[0, 250, 500, 750, 1000]} tickLine={false} axisLine={false} tick={{ fill: "#9CA3AF", fontSize: 11 }} width={35} />
-                  <Tooltip contentStyle={{ borderRadius: "10px", border: "1px solid #E5E7EB", fontSize: "12px" }} />
-                  <Area type="monotone" dataKey="value" stroke="none" fill="url(#areaGradient)" />
-                  <Line type="monotone" dataKey="value" stroke="url(#lineGradient)" strokeWidth={2.5} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
+            <div className="relative" style={{ height: "360px" }}>
+
+              {/* LABEL SCALE */}
+              <div className="absolute left-0 top-[58px] h-[250px] flex flex-col justify-between text-[#98A2B3] text-[12px] z-10">
+                <span>10000 m³</span>
+                <span>1000 m³</span>
+                <span>100 m³</span>
+                <span>0 m³</span>
+              </div>
+
+              {/* CHART */}
+              <div className="pl-[75px] h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    barCategoryGap={10}
+                    barGap={2}
+                    margin={{ top: 25, right: 0, left: 10, bottom: 25 }}
+                  >
+                    <defs>
+                      <linearGradient id="barBlue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#60A5FA" />
+                        <stop offset="100%" stopColor="#2173FF" />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="month" tickLine={false} axisLine={false}
+                      tick={{ fill: "#9CA3AF", fontSize: 11, fontWeight: 500 }} />
+                    <YAxis hide domain={[0, 100]} />
+                    <Tooltip content={<CustomTooltip />} cursor={false} />
+                    <Bar dataKey="value" shape={<RoundedBar />}>
+                      {chartData.map((entry, index) => (
+                        <Cell key={index} fill={entry.active ? "url(#barBlue)" : "#DCE3EC"} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
             </div>
           </div>
 
           {/* PAYMENT TABLE */}
-          <div className="w-full bg-white rounded-[12px] border border-slate-200 overflow-hidden">
-            <div className="flex justify-between items-center px-[20px] py-[14px]">
-              <h3 className="text-[14px] font-semibold text-gray-700">Riwayat pembayaran</h3>
+          <div className="bg-white rounded-[20px] border border-gray-100 shadow-sm overflow-hidden">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-gray-50">
+              <h3 className="text-[15px] font-bold text-gray-800">Riwayat pembayaran</h3>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 bg-gray-100 px-3 h-[34px] rounded-[10px] w-[160px]">
+
+                {/* Search */}
+                <div className="flex items-center gap-2 bg-gray-100 px-3 h-[34px] rounded-[10px] w-[150px]">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" className="w-3.5 h-3.5 shrink-0">
-                    <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                   </svg>
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={paymentSearch}
+                  <input type="text" placeholder="Search..." value={paymentSearch}
                     onChange={e => setPaymentSearch(e.target.value)}
-                    className="bg-transparent outline-none text-[12px] w-full text-gray-600 placeholder-gray-400"
-                  />
+                    className="bg-transparent outline-none text-[12px] w-full text-gray-600 placeholder-gray-400" />
                 </div>
+
+                {/* Filter */}
                 <div className="relative" ref={filterRef}>
-                  <button
-                    onClick={() => setFilterOpen(!filterOpen)}
-                    className="flex items-center gap-1.5 text-[12px] text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[34px] rounded-[10px] transition"
-                  >
+                  <button onClick={() => setFilterOpen(!filterOpen)}
+                    className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[34px] rounded-[10px] transition">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
                       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                     </svg>
                     {filterStatus}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><path d="M6 9l6 6 6-6" /></svg>
                   </button>
                   {filterOpen && (
-                    <div className="absolute right-0 top-[40px] w-[160px] bg-white rounded-[12px] shadow-lg border border-gray-100 p-1.5 z-50">
+                    <div className="absolute right-0 top-[40px] w-[160px] bg-white rounded-[14px] shadow-lg border border-gray-100 p-1.5 z-50">
                       {(["All", "Lunas", "Belum Dibayar"] as FilterType[]).map(f => (
-                        <button
-                          key={f}
-                          onClick={() => { setFilterStatus(f); setFilterOpen(false) }}
-                          className={`w-full text-left px-3 py-2 text-[12px] rounded-[8px] transition ${
-                            filterStatus === f ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-600 hover:bg-gray-100"
-                          }`}
-                        >
+                        <button key={f} onClick={() => { setFilterStatus(f); setFilterOpen(false) }}
+                          className={`w-full text-left px-3 py-2.5 text-[12px] rounded-[10px] transition font-medium ${filterStatus === f ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}>
                           {f}
                         </button>
                       ))}
@@ -452,45 +457,41 @@ export default function Dashboard() {
 
             <table className="w-full">
               <thead>
-                <tr className="border-t border-slate-200 border-b border-slate-200">
-                  <th className="text-left text-[12px] text-gray-400 font-medium py-3 px-[20px]">ID</th>
-                  <th className="text-left text-[12px] text-gray-400 font-medium py-3">Pemakaian</th>
-                  <th className="text-left text-[12px] text-gray-400 font-medium py-3">Status</th>
-                  <th className="text-left text-[12px] text-gray-400 font-medium py-3 pr-[20px]">Tagihan</th>
+                <tr className="bg-gray-50/80">
+                  <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3 px-5">ID</th>
+                  <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3">Pemakaian</th>
+                  <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3">Status</th>
+                  <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3 pr-5">Tagihan</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredPayments.length > 0 ? filteredPayments.map((row, i) => (
-                  <tr
-                    key={i}
-                    onClick={() => setSelectedRow(selectedRow === i ? null : i)}
-                    className={`border-b border-slate-100 last:border-0 cursor-pointer transition ${
-                      selectedRow === i ? "bg-blue-50" : "hover:bg-gray-50/50"
-                    }`}
-                  >
-                    <td className="py-3 px-[20px] text-[13px] text-gray-700 font-medium">{row.id}</td>
-                    <td className="py-3 text-[13px] text-gray-600">{row.pemakaian}</td>
-                    <td className="py-3">
-                      <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full ${
-                        row.status === "Lunas" ? "text-green-600 bg-green-100" : "text-red-500 bg-red-100"
+                  <tr key={i} className="border-t border-gray-50 hover:bg-blue-50/30 transition cursor-default">
+                    <td className="py-3.5 px-5 text-[13px] font-semibold text-gray-800">{row.id}</td>
+                    <td className="py-3.5 text-[13px] text-gray-500">{row.pemakaian}</td>
+                    <td className="py-3.5">
+                      <span className={`text-[11px] font-semibold px-3 py-1 rounded-full ${
+                        row.status === "Lunas"
+                          ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
+                          : "text-rose-500 bg-rose-50 border border-rose-100"
                       }`}>
                         {row.status}
                       </span>
                     </td>
-                    <td className="py-3 pr-[20px] text-[13px] text-gray-600">{row.tagihan}</td>
+                    <td className="py-3.5 pr-5 text-[13px] text-gray-500 font-medium">{row.tagihan}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-[13px] text-gray-400">
-                      Tidak ada data yang cocok
-                    </td>
+                    <td colSpan={4} className="py-8 text-center text-[13px] text-gray-400">Tidak ada data yang cocok</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
         </div>
 
+<<<<<<< HEAD
         {/* RIGHT */}
         <div className="flex flex-col gap-[12px] w-full lg:w-[365px]">
           <div
@@ -498,6 +499,31 @@ export default function Dashboard() {
             style={{ height: "171px", background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.35)" }}
           >
             <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
+=======
+        {/* ===== RIGHT COLUMN ===== */}
+        <div className="flex flex-col gap-4">
+
+               {/* SMART ALERTS */}
+          <div
+  className="
+    rounded-[20px]
+    p-5
+    flex
+    flex-col
+    gap-4
+    relative
+    overflow-hidden
+    ml-[-10px]
+    w-[calc(100%+10px)]
+  "
+            style={{
+              background: "linear-gradient(135deg, #1E90FF 0%, #0022FF 100%)",
+              boxShadow: "0 8px 32px rgba(0,34,255,0.28)",
+            }}
+          >
+            {/* decorative blob */}
+           <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
+>>>>>>> 4f7171c (Update frontend UI)
             <p className="text-[14px] font-semibold text-white relative z-10">Smart Alerts</p>
             <div className="bg-blue-400/50 rounded-[10px] h-[44px] flex items-center justify-center relative z-10">
               <p className="text-[13px] text-white font-medium">3 anomali terdeteksi hari ini</p>
@@ -507,6 +533,7 @@ export default function Dashboard() {
             </button>
           </div>
 
+<<<<<<< HEAD
           <div className="bg-white rounded-[12px] p-[20px] border border-slate-200 flex flex-col gap-[10px]" style={{ height: "427px" }}>
             <h3 className="text-[14px] font-semibold text-gray-700 text-center">Sebaran Status Pembayaran</h3>
             <div className="flex items-center justify-center flex-1">
@@ -539,6 +566,102 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+=======
+  {/* SEBARAN STATUS PEMBAYARAN */}
+<div
+  className="
+    w-full
+    h-[464px]
+    rounded-[20px]
+    border
+    border-[#EEF2F6]
+    bg-white
+    px-6
+    pt-7
+    pb-6
+    flex
+    flex-col
+    shadow-[0_1px_2px_rgba(16,24,40,0.04)]
+  "
+>
+
+  {/* TITLE */}
+  <h3 className="text-[16px] leading-[24px] font-medium text-[#344054] mb-[34px]">
+    Sebaran Status Pembayaran
+  </h3>
+
+  {/* DONUT */}
+  <div className="flex-1 flex items-center justify-center">
+
+    <div className="relative">
+
+      <PieChart width={270} height={270}>
+
+        <defs>
+          <linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4F9CF9" />
+            <stop offset="100%" stopColor="#0034FF" />
+          </linearGradient>
+        </defs>
+
+        <Pie
+          data={pieData}
+          innerRadius={74}
+          outerRadius={114}
+          dataKey="value"
+          stroke="none"
+          startAngle={90}
+          endAngle={-270}
+        >
+          <Cell fill="url(#donutGrad)" />
+          <Cell fill="#E4E7EC" />
+        </Pie>
+
+      </PieChart>
+
+      {/* CENTER TEXT */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+
+        <p className="text-[26px] leading-none font-semibold text-[#344054]">
+          80%
+        </p>
+
+        <p className="mt-[10px] text-[14px] leading-[22px] text-[#98A2B3] text-center font-normal">
+          Sudah bayar 40
+          <br />
+          dari 50 unit
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* LEGEND */}
+  <div className="flex items-center justify-center gap-6 mt-2">
+
+    <div className="flex items-center gap-2">
+      <div className="w-[16px] h-[16px] rounded-full bg-[#245BFF]" />
+
+      <span className="text-[14px] leading-[22px] font-normal text-[#344054]">
+        Sudah bayar
+      </span>
+    </div>
+
+    <div className="flex items-center gap-2">
+      <div className="w-[16px] h-[16px] rounded-full bg-[#E4E7EC]" />
+
+      <span className="text-[14px] leading-[22px] font-normal text-[#344054]">
+        Belum bayar
+      </span>
+    </div>
+
+  </div>
+
+</div>
+
+>>>>>>> 4f7171c (Update frontend UI)
         </div>
       </div>
 
@@ -546,46 +669,44 @@ export default function Dashboard() {
       {openModal && (
         <TambahUserModal
           onClose={() => setOpenModal(false)}
-          onSuccess={(email) => {
-            setAddedEmail(email)
-            setOpenModal(false)
-            setSuccessModal(true)
-          }}
+          onSuccess={email => { setAddedEmail(email); setOpenModal(false); setSuccessModal(true) }}
         />
       )}
+      {successModal && <SuccessModal email={addedEmail} onClose={() => setSuccessModal(false)} />}
 
-      {successModal && (
-        <SuccessModal
-          email={addedEmail}
-          onClose={() => setSuccessModal(false)}
-        />
-      )}
     </div>
   )
 }
 
 /* ===================== STAT CARD ===================== */
-function StatCard({ title, value, desc, extra, extraType, icon }: {
-  title: string; value: string; desc?: string; extra?: string; extraType?: "green" | "red"; icon: string
-}) {
+type StatCardProps = {
+  title: string
+  value: string
+  subtext?: string
+  badge?: string
+  badgeType?: "green" | "red"
+  icon: string
+}
+
+function StatCard({ title, value, subtext, badge, badgeType, icon }: StatCardProps) {
   return (
-    <div className="bg-white rounded-[16px] h-[128px] px-[20px] py-[16px] border border-slate-200 flex flex-col justify-between">
-      <div className="flex justify-between items-start">
-        <p className="text-[16px] font-medium text-gray-700 leading-tight">{title}</p>
-        <div className="w-[36px] h-[36px] bg-gray-100 rounded-[10px] flex items-center justify-center hover:bg-gray-200 transition cursor-pointer">
-          <img src={icon} className="w-5 opacity-80" />
-        </div>
-      </div>
-      <div>
-        <h2 className="text-[24px] font-semibold text-gray-900 leading-tight">{value}</h2>
-        {desc  && <p className="text-[14px] text-gray-400 mt-[2px]">{desc}</p>}
-        {extra && (
-          <span className={`inline-flex items-center gap-1 text-[12px] font-medium px-2 py-0.5 rounded-full mt-1 ${
-            extraType === "green" ? "text-green-600 bg-green-100" : "text-red-500 bg-red-100"
+    <div className="w-full h-[158px] rounded-[20px] border border-[#EAEEF3] bg-white px-7 flex items-center justify-between shadow-sm">
+      <div className="flex flex-col justify-center">
+        <p className="text-[14px] leading-[20px] text-[#667085] font-medium mb-[18px]">{title}</p>
+        <h2 className="text-[22px] leading-none tracking-[-0.02em] text-[#101828] font-semibold">{value}</h2>
+        {subtext && (
+          <p className="mt-[10px] text-[13px] leading-[18px] text-[#98A2B3]">{subtext}</p>
+        )}
+        {badge && (
+          <span className={`inline-flex items-center w-fit px-[10px] py-[4px] rounded-full text-[12px] font-medium mt-[12px] ${
+            badgeType === "green" ? "bg-[#ECFDF3] text-[#027A48]" : "bg-[#FEF3F2] text-[#D92D20]"
           }`}>
-            {extra}
+            {badge}
           </span>
         )}
+      </div>
+      <div className="w-[44px] h-[44px] rounded-[12px] bg-[#E5E7EB] flex items-center justify-center shrink-0">
+        <img src={icon} className="w-[20px] h-[20px] object-contain opacity-70" />
       </div>
     </div>
   )
