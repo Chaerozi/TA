@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Gedung from "../assets/Login/Gedung.svg";
-import Logo from "../assets/Login/Logo.svg";
+import Logo from "../assets/Login/TeksAquora.svg";
 import Water from "../assets/Login/Water.svg";
 import Mobile from "../assets/Login/Mobile.svg";
 

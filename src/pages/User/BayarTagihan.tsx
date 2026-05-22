@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import Panah from "../../assets/Tagihan/Panah.svg";
 import BelumBayar from "../../assets/beranda/Blumbayar.svg";
@@ -8,6 +9,27 @@ import Unduh from "../../assets/Tagihan/Unduh.svg";
 export default function BayarTagihan() {
 
   const navigate = useNavigate();
+  const handlePayment = async () => {
+  try {
+
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/payment",
+      {
+        billId: "BILL-002"
+      }
+    );
+
+    const paymentUrl = response.data.data.paymentUrl;
+
+    // Redirect ke Xendit
+    window.location.href = paymentUrl;
+
+  } catch (error) {
+    console.error(error);
+
+    alert("Gagal membuat pembayaran");
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
@@ -104,7 +126,7 @@ export default function BayarTagihan() {
 
         {/* ================= BUTTON BAYAR ================= */}
 <button
-onClick={() => navigate("/metode-pembayaran")}
+onClick={handlePayment}
   className="w-full h-[40px] flex items-center justify-center gap-2 text-white text-[14px] font-medium active:scale-[0.97] transition"
   style={{
     borderRadius: "34px",

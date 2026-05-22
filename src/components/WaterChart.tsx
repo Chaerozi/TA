@@ -111,96 +111,97 @@ function ActiveIndicator({
     </g>
   );
 }
-
-type WaterChartProps = {
-  range: ChartRange;
+type ChartItem = {
+  timestamp: string;
+  cumulative: number;
+  forward: number;
+  backward: number;
 };
+type WaterChartProps = {
+  data?: any[]
+}
 
-export default function WaterChart({ range }: WaterChartProps) {
-  const baseData = DATA_BY_RANGE[range];
-  const data = useMemo<IndexedChartDatum[]>(
-    () => baseData.map((item, idx) => ({ ...item, idx })),
-    [baseData]
-  );
+export default function WaterChart({ data = [] }: WaterChartProps) {
+console.log("RAW DATA:", data)
 
-  const maxValue = Math.max(...data.map((item) => item.value));
+const chartData = useMemo(() => {
+  return (data ?? []).slice(0, 12).map((item, idx) => ({
+    idx,
+    x: `M${idx + 1}`,
+    value: Number(item.forward ?? 0),
+    bar: Number(item.forward ?? 0),
+  }))
+}, [data])
+
+console.log("CHART DATA:", chartData)
+
+const maxValue = Math.max(
+  ...(chartData ?? []).map((item) => Number(item.value || 0)),
+  10
+);
   const yMax = Math.ceil((maxValue + 5) / 10) * 10;
 
-  return (
-    <div className="w-full h-[240px]">
+return (
+  <div className="w-full h-[260px]">
+    <ResponsiveContainer width="100%" height={260}>
+      <ComposedChart
+        data={chartData}
+        margin={{ top: 24, right: 0, left: 0, bottom: 0 }}
+      >
 
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart
-          data={data}
-          margin={{ top: 24, right: 0, left: 0, bottom: 0 }}
-        >
+        <defs>
+          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.18}/>
+            <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}/>
+          </linearGradient>
+        </defs>
 
-          <defs>
-  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.18}/>
-    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}/>
-  </linearGradient>
-</defs>
-          {/* histogram background */}
-          <Bar
-            dataKey="bar"
-            fill="#9CA3AF"
-            opacity={0.18}
-            barSize={4}
-          />
+        <Bar
+          dataKey="bar"
+          fill="#9CA3AF"
+          opacity={0.18}
+          barSize={4}
+        />
 
-        {/* area gradient */}
-<Area
-  type="natural"
-  dataKey="value"
-  stroke="none"
-  fill="url(#areaGradient)"
-  fillOpacity={0.9}
-/>
+        <Area
+          type="monotone"
+          dataKey="value"
+          fill="url(#areaGradient)"
+          stroke="#2563EB"
+          strokeWidth={2}
+        />
 
-{/* smooth curved line */}
-<Line
-  type="natural"
-  dataKey="value"
-  stroke="#2563EB"
-  strokeWidth={2.8}
-  strokeLinecap="round"
-  strokeLinejoin="round"
-  dot={false}
-  activeDot={<ActiveIndicator />}
-  connectNulls
-/>
+        <Line
+          type="monotone"
+          dataKey="value"
+          stroke="#2563EB"
+          strokeWidth={4}
+          dot={true}
+        />
 
-          {/* DAYS */}
-          <XAxis
-            type="number"
-            dataKey="idx"
-            domain={[0, data.length - 1]}
-            ticks={data.map((item) => item.idx)}
-            tickFormatter={(value) => data[Number(value)]?.x ?? ""}
-            allowDecimals={false}
-            interval={0}
-            padding={{ left: 0, right: 0 }}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#9CA3AF" }}
-          />
+        <XAxis
+          type="number"
+          dataKey="idx"
+          domain={[0, (chartData ?? []).length - 1]}
+          ticks={(chartData ?? []).map((item) => item.idx)}
+          tickFormatter={(value) => (chartData ?? [])[Number(value)]?.x ?? ""}
+          allowDecimals={false}
+          interval={0}
+          padding={{ left: 0, right: 0 }}
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 11, fill: "#9CA3AF" }}
+        />
 
-          {/* NUMBERS */}
-          <YAxis
-            orientation="right"
-            domain={[0, yMax]}
-            ticks={[10, 20, 30, 40, 50, 60].filter((tick) => tick <= yMax)}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize:11, fill:"#9CA3AF"}}
-            tickMargin={6}
-            width={30}
-          />
+        <YAxis
+          orientation="right"
+          domain={[0, maxValue + 10]}
+          axisLine={false}
+          tickLine={false}
+        />
 
-        </ComposedChart>
-      </ResponsiveContainer>
-
-    </div>
-  );
+      </ComposedChart>
+    </ResponsiveContainer>
+  </div>
+);
 }

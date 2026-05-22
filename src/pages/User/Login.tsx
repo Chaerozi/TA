@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import Gedung from "../../assets/Login/Gedung.svg";
-import Logo from "../../assets/Login/Logo.svg";
+import Gedung from "../../assets/Login/New.svg";
+import Logo from "../../assets/Login/TeksAquora.svg";
 import Water from "../../assets/Login/Water.svg";
+import Teks from "../../assets/adminDasbord/Logo.svg";
+import Berhasil from "../../assets/adminDasbord/Berhasil.svg";
 
 export default function Login() {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+const [showActivatedPopup, setShowActivatedPopup] =
+  useState(location.state?.activated || false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -80,35 +86,43 @@ export default function Login() {
       {/* ================= MOBILE ================= */}
       <div className="block md:hidden min-h-screen bg-[#F3F4F6]">
 
-        {/* HEADER */}
-        <div className="relative h-[254px] px-6 pt-14 bg-gradient-to-b from-[#0096FF] to-[#0022FF] overflow-hidden">
+       {/* HEADER */}
+      <div className="relative h-[254px] px-6 pt-14 bg-gradient-to-b from-[#0096FF] to-[#0022FF] overflow-hidden">
 
-          {/* LOGO */}
-          <div className="mt-5 mb-4">
+        {/* LOGO */}
+          <div className="mt-2 mb-2">
             <img src={Logo} alt="Aquora Logo" className="h-7 w-auto object-contain" />
           </div>
 
-          {/* DESCRIPTION */}
-          <p className="mt-3 text-white text-[12px] leading-[20px] w-[228px]">
-            Aquora membantu kamu memantau
-            penggunaan air secara real-time dan
-            membayar tagihan dengan lebih
-            transparan dan praktis.
-          </p>
+        {/* DESCRIPTION */}
+        <p className="mt-4 text-white text-[12px] leading-[18px] w-[225px]">
+          Aquora membantu kamu memantau
+          penggunaan air secara real-time dan
+          membayar tagihan dengan lebih
+          transparan dan praktis.
+        </p>
 
-          {/* GEDUNG */}
-          <div className="absolute right-0 -bottom-6 w-[210px]">
-            <img src={Gedung} alt="Gedung" className="w-full h-auto object-contain" />
-          </div>
-        </div>
+      {/* GEDUNG */}
+<div className="absolute right-0 bottom-0 w-[215px] h-[215px]">
+  <img
+    src={Gedung}
+    alt="Gedung"
+    className="w-full h-full object-contain"
+  />
+</div>
+      </div>
 
-        {/* FLOATING LOGIN CARD */}
-        <div className="-mt-16 bg-[#F3F4F6] rounded-t-[12px] px-5 pt-8 pb-10">
+      {/* FORM SECTION */}
+      <div className="relative z-20 -mt-[24px] rounded-t-[12px] bg-[#F3F4F6] px-4 pt-8 pb-10">
 
-          {/* ICON */}
-          <div className="mb-4">
-            <img src={Water} alt="Water Icon" className="w-8 h-8" />
-          </div>
+   {/* ICON */}
+<div className="mb-4">
+  <img
+    src={Teks}
+    alt="Logo"
+    className="w-[38px] h-[38px] object-contain"
+  />
+</div>
 
           {/* TITLE */}
           <h1 className="text-[22px] font-semibold text-[#0F172A] mb-2">
@@ -242,6 +256,57 @@ export default function Login() {
           </div>
         </div>
       )}
+{/* POPUP BERHASIL */}
+{showActivatedPopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-6">
+
+    <div className="w-full max-w-[272px] rounded-[16px] bg-white px-6 pt-7 pb-6 shadow-xl">
+
+      {/* ICON */}
+      <div className="flex justify-center">
+        <img
+          src={Berhasil}
+          alt="Berhasil"
+          className="w-[72px] h-[72px] object-contain"
+        />
+      </div>
+
+      {/* TITLE */}
+      <h2 className="mt-5 text-center text-[18px] font-bold text-[#1B2340]">
+        Akun Berhasil Diaktifkan
+      </h2>
+
+      {/* DESC */}
+      <p className="mt-2 text-center text-[14px] leading-[22px] text-[#8B93A7]">
+        Akun kamu sudah aktif dan siap digunakan.
+      </p>
+
+      {/* BUTTON */}
+      <button
+        onClick={() => setShowActivatedPopup(false)}
+        className="
+          mt-6
+          h-[40px]
+          w-full
+          rounded-[34px]
+          text-[14px]
+          font-medium
+          text-white
+          transition-all
+          active:scale-[0.98]
+        "
+        style={{
+          background:
+            "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+          boxShadow:
+            "0px 4px 4px rgba(1, 101, 255, 0.2), inset 0px -4px 4px rgba(255, 255, 255, 0.2)",
+        }}
+      >
+        Masuk
+      </button>
+    </div>
+  </div>
+)}
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:flex min-h-screen bg-[#F3F4F6] font-geist">
@@ -373,12 +438,19 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="absolute bottom-0 right-0">
-            <img src={Gedung} alt="Gedung Illustration" />
-          </div>
+          <div className="absolute right-0 -bottom-8 w-[717px] h-[684px]">
+  <img
+    src={Gedung}
+    alt="Gedung Illustration"
+    className="w-full h-full object-contain"
+  />
+</div>
+          
 
         </div>
+        
       </div>
+      
     </>
   );
 }

@@ -4,6 +4,9 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts"
 
+import WaterChart from "../../components/WaterChart"
+import { getDashboardChart } from "../../services/dashboardService"
+
 import totalIcon    from "../../assets/adminDasbord/Total.svg"
 import konsumsiIcon from "../../assets/adminDasbord/Konsumsi.svg"
 import bulanIcon    from "../../assets/adminDasbord/Bulan.svg"
@@ -107,7 +110,7 @@ function TambahUserModal({ onClose, onSuccess }: { onClose: () => void; onSucces
         <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition text-gray-500 text-[14px]">✕</button>
         <h2 className="text-[20px] font-bold text-gray-900 mb-1">Tambah User</h2>
        
-        <div className="space-y-4">
+        <div className="space-y-4 mt-5">
           <div>
             <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 tracking-wide block">Pilih Unit</label>
             <div className="relative">
@@ -132,77 +135,76 @@ function TambahUserModal({ onClose, onSuccess }: { onClose: () => void; onSucces
               <p className="text-[12px] text-red-600">{error}</p>
             </div>
           )}
-<<<<<<< HEAD
-
-          {/* SUBMIT */}
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full h-[48px] text-white text-[14px] font-semibold active:scale-[0.97] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{
-              borderRadius: "34px",
-              border: "1px solid #70B9FF",
-              background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
-              boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
-            }}
+            className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.25)" }}
           >
-            {loading ? (
-              <>
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" />
-                  <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" />
-                </svg>
-                Mengirim...
-              </>
-            ) : (
-              "Tambah User & Kirim Email"
-            )}
-=======
-          <button onClick={handleSubmit} disabled={loading}
-            className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
-            style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.30)" }}>
-            {loading
-              ? (<><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" /><path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" /></svg>Mengirim...</>)
-              : "Tambah User & Kirim Email"}
->>>>>>> 4f7171c (Update frontend UI)
+            {loading ? "Menambahkan..." : "Tambah User"}
           </button>
         </div>
+        
       </div>
+      
     </div>
+    
   )
 }
+
 
 /* ===================== SUCCESS MODAL ===================== */
 function SuccessModal({ email, onClose }: { email: string; onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/25 backdrop-blur-[3px] flex items-center justify-center z-[999]" onClick={onClose}>
       <div className="w-[400px] bg-white rounded-[24px] p-8 text-center shadow-[0_32px_80px_rgba(0,0,0,0.15)]" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-center mb-5"><img src={succesIcon} className="w-[72px]" /></div>
+        <div className="flex justify-center mb-5"><img src={succesIcon} className="w-[72px]" alt="success" /></div>
         <h2 className="text-[20px] font-bold text-gray-900 mb-2">Akun berhasil ditambahkan!</h2>
         <p className="text-[13px] text-gray-400 mb-1">Email aktivasi telah dikirim ke:</p>
         <p className="text-[14px] font-semibold text-blue-600 mb-4 break-all">{email}</p>
         <p className="text-[13px] text-gray-400 mb-7 leading-relaxed">
           Minta pengguna cek inbox-nya dan buat kata sandi untuk mengaktifkan akun.
         </p>
-<<<<<<< HEAD
 
-        <button
-          onClick={onClose}
-          className="w-full h-[48px] text-white text-[14px] font-semibold active:scale-[0.97] transition-all"
-          style={{
-            borderRadius: "34px",
-            border: "1px solid #70B9FF",
-            background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
-            boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
-          }}
-        >
-=======
         <button onClick={onClose}
           className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97]"
           style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.25)" }}>
->>>>>>> 4f7171c (Update frontend UI)
           Selesai
         </button>
+      </div>
+    </div>
+  )
+}
+
+/* ===================== STAT CARD ===================== */
+type StatCardProps = {
+  title: string
+  value: string
+  subtext?: string
+  badge?: string
+  badgeType?: "green" | "red"
+  icon: string
+}
+
+function StatCard({ title, value, subtext, badge, badgeType, icon }: StatCardProps) {
+  return (
+    <div className="w-full h-[158px] rounded-[20px] border border-[#EAEEF3] bg-white px-7 flex items-center justify-between shadow-sm">
+      <div className="flex flex-col justify-center">
+        <p className="text-[14px] leading-[20px] text-[#667085] font-medium mb-[18px]">{title}</p>
+        <h2 className="text-[22px] leading-none tracking-[-0.02em] text-[#101828] font-semibold">{value}</h2>
+        {subtext && (
+          <p className="mt-[10px] text-[13px] leading-[18px] text-[#98A2B3]">{subtext}</p>
+        )}
+        {badge && (
+          <span className={`inline-flex items-center w-fit px-[10px] py-[4px] rounded-full text-[12px] font-medium mt-[12px] ${
+            badgeType === "green" ? "bg-[#ECFDF3] text-[#027A48]" : "bg-[#FEF3F2] text-[#D92D20]"
+          }`}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className="w-[44px] h-[44px] rounded-[12px] bg-[#E5E7EB] flex items-center justify-center shrink-0">
+        <img src={icon} className="w-[20px] h-[20px] object-contain opacity-70" alt="icon" />
       </div>
     </div>
   )
@@ -211,7 +213,8 @@ function SuccessModal({ email, onClose }: { email: string; onClose: () => void }
 /* ===================== MAIN DASHBOARD ===================== */
 export default function Dashboard() {
   const [range, setRange] = useState<RangeType>("6 Bulan Terakhir")
-
+  const [waterData, setWaterData] = useState<any[]>([])
+  
   const chartData = barData[range as keyof typeof barData].flatMap((item) => {
     const highest = Math.max(...item.values)
     return item.values.map((value, index) => ({
@@ -248,15 +251,35 @@ export default function Dashboard() {
     return matchSearch && matchFilter
   })
 
+  useEffect(() => {
+  const fetchChart = async () => {
+    const token = localStorage.getItem("token")
+    
+    console.log("TOKEN VALUE:", token)  // ← cek ini dulu
+    
+    if (!token) {
+      console.log("TOKEN NULL - fetch dibatalkan")  // ← kalau ini muncul, ketemu masalahnya
+      return
+    }
+    
+    try {
+      const result = await getDashboardChart(token)
+      console.log("RESULT:", result)
+      setWaterData(result)
+    } catch (err) {
+      console.error("FETCH ERROR:", err)
+    }
+  }
+  fetchChart()
+}, [])
+
   return (
     <div className="space-y-5 max-w-[1400px] mx-auto">
 
       {/* ================= HEADER ================= */}
       <div className="flex items-start justify-between gap-4">
-
-        {/* LEFT — title */}
         <div className="w-[215px]">
-          <p className="text-[24px] leading-[33px] font-normal text-[#98A2B3] tracking-[-0.02em] capitalize">
+          <p className="text-[24px] leading-[33px] font-normal text-[#98A2B3] tracking-[-0.02em]">
             Smart Water Meter
           </p>
           <h1 className="text-[32px] leading-[33px] font-medium text-[#344054] tracking-[-0.03em] mt-[2px]">
@@ -264,62 +287,43 @@ export default function Dashboard() {
           </h1>
         </div>
 
-<<<<<<< HEAD
-        <div className="flex items-center gap-3">
-          <button className="h-[40px] px-4 bg-white border border-gray-200 text-gray-700 text-[14px] font-medium flex items-center gap-2 hover:bg-gray-50 transition shadow-sm" style={{ borderRadius: "34px" }}>
-            <div className="w-[26px] h-[26px] bg-white rounded-[8px] flex items-center justify-center">
-              <img src={kelolaIcon} className="w-4" />
-            </div>
-            Kelola Air
-          </button>
-
-          <button
-            onClick={() => setOpenModal(true)}
-            className="h-[40px] px-4 text-white text-[14px] font-semibold active:scale-[0.97] transition-all flex items-center gap-1.5"
-            style={{
-              borderRadius: "34px",
-              border: "1px solid #70B9FF",
-              background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
-              boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
-            }}
-          >
-            <span className="text-[16px] font-light">+</span>
-            Tambah User
-          </button>
-=======
-        {/* RIGHT — profile pill */}
         <div className="w-[302px] h-[68px] rounded-full border border-[#EAECF0] bg-white px-[14px] flex items-center justify-between shadow-[0_1px_2px_rgba(16,24,40,0.05)] shrink-0">
           <div className="flex items-center gap-[14px]">
             <div className="w-[52px] h-[52px] rounded-full bg-[#F2F4F7] flex items-center justify-center">
-              <img src={notifIcon} className="w-[24px] h-[24px] opacity-60" />
+              <img
+                src={notifIcon}
+                className="w-[24px] h-[24px] opacity-60"
+                alt="notification"
+              />
             </div>
             <div className="flex flex-col justify-center">
-              <p className="text-[20px] leading-[22px] font-medium text-[#344054] tracking-[-0.02em] w-[126px]">
+              <p className="text-[20px] leading-[22px] font-medium text-[#344054]">
                 Hi, Admin
               </p>
-              <p className="mt-[6px] text-[14px] leading-[22px] font-normal text-[#98A2B3] w-[128px]">
+              <p className="mt-[6px] text-[14px] leading-[22px] font-normal text-[#98A2B3]">
                 Welcome to Aquora
               </p>
             </div>
           </div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-[18px] h-[18px] text-[#98A2B3] shrink-0">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            className="w-[18px] h-[18px] text-[#98A2B3]"
+          >
             <path d="M6 9l6 6 6-6" />
           </svg>
->>>>>>> 4f7171c (Update frontend UI)
         </div>
-
       </div>
 
       {/* ================= ACTION BUTTONS ================= */}
       <div className="flex items-center gap-4">
-
-        {/* KELOLA HARGA AIR */}
         <button className="w-[200px] h-[53px] rounded-[34px] bg-white border border-[#E4E7EC] flex items-center justify-center gap-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] hover:bg-gray-50 transition-all">
-          <img src={kelolaIcon} className="w-[18px] h-[18px] opacity-70" />
+          <img src={kelolaIcon} className="w-[18px] h-[18px] opacity-70" alt="kelola" />
           <span className="text-[14px] font-medium text-[#344054]">Kelola Harga Air</span>
         </button>
 
-        {/* TAMBAH USER */}
         <button
           onClick={() => setOpenModal(true)}
           className="w-[178px] h-[53px] rounded-[34px] flex items-center justify-center gap-3 text-white transition-all active:scale-[0.98] hover:shadow-[0_10px_30px_rgba(0,52,255,0.35)]"
@@ -328,11 +332,10 @@ export default function Dashboard() {
           <span className="text-[32px] leading-none font-light mb-[2px]">+</span>
           <span className="text-[14px] font-medium tracking-[-0.01em]">Tambah User</span>
         </button>
-
       </div>
 
       {/* ================= STAT CARDS ================= */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard title="Total Unit Aktif"      value="48"            subtext="Dari 50 unit terdaftar" icon={totalIcon} />
         <StatCard title="Konsumsi Hari Ini"     value="842.5 m³"      badge="+3.2%"  badgeType="green" icon={konsumsiIcon} />
         <StatCard title="Konsumsi Bulan Ini"    value="18,320 m³"     badge="-1.8%"  badgeType="red"   icon={bulanIcon} />
@@ -346,11 +349,10 @@ export default function Dashboard() {
         <div className="space-y-4 min-w-0">
 
           {/* BAR CHART CARD */}
-          <div className="bg-white rounded-[20px] border border-gray-100 shadow-sm p-5 pr-">
+          <div className="bg-white rounded-[20px] border border-gray-100 shadow-sm p-5">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-[15px] font-bold text-gray-800">Volume pemakaian air</h3>
 
-              {/* Range dropdown */}
               <div className="relative" ref={rangeRef}>
                 <button
                   onClick={() => setRangeOpen(!rangeOpen)}
@@ -375,8 +377,6 @@ export default function Dashboard() {
             </div>
 
             <div className="relative" style={{ height: "360px" }}>
-
-              {/* LABEL SCALE */}
               <div className="absolute left-0 top-[58px] h-[250px] flex flex-col justify-between text-[#98A2B3] text-[12px] z-10">
                 <span>10000 m³</span>
                 <span>1000 m³</span>
@@ -384,34 +384,9 @@ export default function Dashboard() {
                 <span>0 m³</span>
               </div>
 
-              {/* CHART */}
-              <div className="pl-[75px] h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    barCategoryGap={10}
-                    barGap={2}
-                    margin={{ top: 25, right: 0, left: 10, bottom: 25 }}
-                  >
-                    <defs>
-                      <linearGradient id="barBlue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="100%" stopColor="#2173FF" />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="month" tickLine={false} axisLine={false}
-                      tick={{ fill: "#9CA3AF", fontSize: 11, fontWeight: 500 }} />
-                    <YAxis hide domain={[0, 100]} />
-                    <Tooltip content={<CustomTooltip />} cursor={false} />
-                    <Bar dataKey="value" shape={<RoundedBar />}>
-                      {chartData.map((entry, index) => (
-                        <Cell key={index} fill={entry.active ? "url(#barBlue)" : "#DCE3EC"} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
+<div className="pl-[75px] h-[300px]">
+  <WaterChart data={waterData?.[0]?.data ?? []} />
+</div>
             </div>
           </div>
 
@@ -421,7 +396,6 @@ export default function Dashboard() {
               <h3 className="text-[15px] font-bold text-gray-800">Riwayat pembayaran</h3>
               <div className="flex items-center gap-2">
 
-                {/* Search */}
                 <div className="flex items-center gap-2 bg-gray-100 px-3 h-[34px] rounded-[10px] w-[150px]">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" className="w-3.5 h-3.5 shrink-0">
                     <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
@@ -431,7 +405,6 @@ export default function Dashboard() {
                     className="bg-transparent outline-none text-[12px] w-full text-gray-600 placeholder-gray-400" />
                 </div>
 
-                {/* Filter */}
                 <div className="relative" ref={filterRef}>
                   <button onClick={() => setFilterOpen(!filterOpen)}
                     className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[34px] rounded-[10px] transition">
@@ -491,31 +464,12 @@ export default function Dashboard() {
 
         </div>
 
-<<<<<<< HEAD
-        {/* RIGHT */}
-        <div className="flex flex-col gap-[12px] w-full lg:w-[365px]">
-          <div
-            className="rounded-[12px] p-[20px] flex flex-col gap-[10px] relative overflow-hidden"
-            style={{ height: "171px", background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.35)" }}
-          >
-            <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
-=======
         {/* ===== RIGHT COLUMN ===== */}
-        <div className="flex flex-col gap-4">
+        <div className="space-y-4">
 
-               {/* SMART ALERTS */}
+           {/* SMART ALERTS */}
           <div
-  className="
-    rounded-[20px]
-    p-5
-    flex
-    flex-col
-    gap-4
-    relative
-    overflow-hidden
-    ml-[-10px]
-    w-[calc(100%+10px)]
-  "
+            className="rounded-[20px] p-5 flex flex-col gap-3 relative overflow-hidden"
             style={{
               background: "linear-gradient(135deg, #1E90FF 0%, #0022FF 100%)",
               boxShadow: "0 8px 32px rgba(0,34,255,0.28)",
@@ -523,7 +477,6 @@ export default function Dashboard() {
           >
             {/* decorative blob */}
            <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
->>>>>>> 4f7171c (Update frontend UI)
             <p className="text-[14px] font-semibold text-white relative z-10">Smart Alerts</p>
             <div className="bg-blue-400/50 rounded-[10px] h-[44px] flex items-center justify-center relative z-10">
               <p className="text-[13px] text-white font-medium">3 anomali terdeteksi hari ini</p>
@@ -533,135 +486,58 @@ export default function Dashboard() {
             </button>
           </div>
 
-<<<<<<< HEAD
-          <div className="bg-white rounded-[12px] p-[20px] border border-slate-200 flex flex-col gap-[10px]" style={{ height: "427px" }}>
-            <h3 className="text-[14px] font-semibold text-gray-700 text-center">Sebaran Status Pembayaran</h3>
-            <div className="flex items-center justify-center flex-1">
+          {/* PIE CHART */}
+          <div className="w-full h-[464px] rounded-[20px] border border-[#EEF2F6] bg-white px-6 pt-7 pb-6 flex flex-col shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+            <h3 className="text-[16px] leading-[24px] font-medium text-[#344054] mb-[34px]">
+              Sebaran Status Pembayaran
+            </h3>
+
+            <div className="flex-1 flex items-center justify-center">
               <div className="relative">
-                <PieChart width={325} height={325}>
+                <PieChart width={270} height={270}>
                   <defs>
-                    <linearGradient id="donutGradient" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#0096FF" />
-                      <stop offset="100%" stopColor="#0022FF" />
+                    <linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#4F9CF9" />
+                      <stop offset="100%" stopColor="#0034FF" />
                     </linearGradient>
                   </defs>
-                  <Pie data={pieData} innerRadius={90} outerRadius={140} dataKey="value" stroke="none" startAngle={90} endAngle={-270}>
-                    {pieData.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
+
+                  <Pie
+                    data={pieData}
+                    innerRadius={74}
+                    outerRadius={114}
+                    dataKey="value"
+                    stroke="none"
+                    startAngle={90}
+                    endAngle={-270}
+                  >
+                    <Cell fill="url(#donutGrad)" />
+                    <Cell fill="#E4E7EC" />
                   </Pie>
                 </PieChart>
+
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <p className="text-[24px] font-semibold text-gray-800 leading-none">80%</p>
-                  <p className="text-[12px] text-gray-400 text-center leading-tight mt-[4px]">Sudah bayar 40<br />dari 50 unit</p>
+                  <p className="text-[26px] leading-none font-semibold text-[#344054]">80%</p>
+                  <p className="mt-[10px] text-[14px] leading-[22px] text-[#98A2B3] text-center font-normal">
+                    Sudah bayar 40<br />dari 50 unit
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="flex justify-center gap-5 pb-1">
+
+            <div className="flex items-center justify-center gap-6 mt-2">
               <div className="flex items-center gap-2">
-                <div className="w-[10px] h-[10px] rounded-full bg-[#0096FF]" />
-                <span className="text-[12px] text-gray-500">Sudah bayar</span>
+                <div className="w-[16px] h-[16px] rounded-full bg-[#245BFF]" />
+                <span className="text-[14px] leading-[22px] font-normal text-[#344054]">Sudah bayar</span>
               </div>
+
               <div className="flex items-center gap-2">
-                <div className="w-[10px] h-[10px] rounded-full bg-gray-200" />
-                <span className="text-[12px] text-gray-500">Belum bayar</span>
+                <div className="w-[16px] h-[16px] rounded-full bg-[#E4E7EC]" />
+                <span className="text-[14px] leading-[22px] font-normal text-[#344054]">Belum bayar</span>
               </div>
             </div>
           </div>
-=======
-  {/* SEBARAN STATUS PEMBAYARAN */}
-<div
-  className="
-    w-full
-    h-[464px]
-    rounded-[20px]
-    border
-    border-[#EEF2F6]
-    bg-white
-    px-6
-    pt-7
-    pb-6
-    flex
-    flex-col
-    shadow-[0_1px_2px_rgba(16,24,40,0.04)]
-  "
->
 
-  {/* TITLE */}
-  <h3 className="text-[16px] leading-[24px] font-medium text-[#344054] mb-[34px]">
-    Sebaran Status Pembayaran
-  </h3>
-
-  {/* DONUT */}
-  <div className="flex-1 flex items-center justify-center">
-
-    <div className="relative">
-
-      <PieChart width={270} height={270}>
-
-        <defs>
-          <linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#4F9CF9" />
-            <stop offset="100%" stopColor="#0034FF" />
-          </linearGradient>
-        </defs>
-
-        <Pie
-          data={pieData}
-          innerRadius={74}
-          outerRadius={114}
-          dataKey="value"
-          stroke="none"
-          startAngle={90}
-          endAngle={-270}
-        >
-          <Cell fill="url(#donutGrad)" />
-          <Cell fill="#E4E7EC" />
-        </Pie>
-
-      </PieChart>
-
-      {/* CENTER TEXT */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-
-        <p className="text-[26px] leading-none font-semibold text-[#344054]">
-          80%
-        </p>
-
-        <p className="mt-[10px] text-[14px] leading-[22px] text-[#98A2B3] text-center font-normal">
-          Sudah bayar 40
-          <br />
-          dari 50 unit
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  {/* LEGEND */}
-  <div className="flex items-center justify-center gap-6 mt-2">
-
-    <div className="flex items-center gap-2">
-      <div className="w-[16px] h-[16px] rounded-full bg-[#245BFF]" />
-
-      <span className="text-[14px] leading-[22px] font-normal text-[#344054]">
-        Sudah bayar
-      </span>
-    </div>
-
-    <div className="flex items-center gap-2">
-      <div className="w-[16px] h-[16px] rounded-full bg-[#E4E7EC]" />
-
-      <span className="text-[14px] leading-[22px] font-normal text-[#344054]">
-        Belum bayar
-      </span>
-    </div>
-
-  </div>
-
-</div>
-
->>>>>>> 4f7171c (Update frontend UI)
         </div>
       </div>
 
@@ -674,40 +550,6 @@ export default function Dashboard() {
       )}
       {successModal && <SuccessModal email={addedEmail} onClose={() => setSuccessModal(false)} />}
 
-    </div>
-  )
-}
-
-/* ===================== STAT CARD ===================== */
-type StatCardProps = {
-  title: string
-  value: string
-  subtext?: string
-  badge?: string
-  badgeType?: "green" | "red"
-  icon: string
-}
-
-function StatCard({ title, value, subtext, badge, badgeType, icon }: StatCardProps) {
-  return (
-    <div className="w-full h-[158px] rounded-[20px] border border-[#EAEEF3] bg-white px-7 flex items-center justify-between shadow-sm">
-      <div className="flex flex-col justify-center">
-        <p className="text-[14px] leading-[20px] text-[#667085] font-medium mb-[18px]">{title}</p>
-        <h2 className="text-[22px] leading-none tracking-[-0.02em] text-[#101828] font-semibold">{value}</h2>
-        {subtext && (
-          <p className="mt-[10px] text-[13px] leading-[18px] text-[#98A2B3]">{subtext}</p>
-        )}
-        {badge && (
-          <span className={`inline-flex items-center w-fit px-[10px] py-[4px] rounded-full text-[12px] font-medium mt-[12px] ${
-            badgeType === "green" ? "bg-[#ECFDF3] text-[#027A48]" : "bg-[#FEF3F2] text-[#D92D20]"
-          }`}>
-            {badge}
-          </span>
-        )}
-      </div>
-      <div className="w-[44px] h-[44px] rounded-[12px] bg-[#E5E7EB] flex items-center justify-center shrink-0">
-        <img src={icon} className="w-[20px] h-[20px] object-contain opacity-70" />
-      </div>
     </div>
   )
 }
