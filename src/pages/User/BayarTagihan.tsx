@@ -9,19 +9,19 @@ import Unduh from "../../assets/Tagihan/Unduh.svg";
 export default function BayarTagihan() {
 
   const navigate = useNavigate();
-  const handlePayment = async () => {
+
+const handlePay = async () => {
   try {
 
-    const response = await axios.post(
-      "http://localhost:3000/api/v1/payment",
-      {
-        billId: "BILL-002"
-      }
-    );
+   const response = await axios.post(
+  "http://localhost:3000/api/v1/payment",
+  {
+    billId: "4439b35d-a393-451f-904a-254c331fe4f0",
+  }
+);
+    const paymentUrl =
+      response.data.data.paymentUrl;
 
-    const paymentUrl = response.data.data.paymentUrl;
-
-    // Redirect ke Xendit
     window.location.href = paymentUrl;
 
   } catch (error) {
@@ -30,7 +30,6 @@ export default function BayarTagihan() {
     alert("Gagal membuat pembayaran");
   }
 };
-
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
       <div className="w-full max-w-[430px] min-h-screen bg-[#F3F4F6] shadow-sm relative px-4 pt-10 pb-10">
@@ -126,13 +125,15 @@ export default function BayarTagihan() {
 
         {/* ================= BUTTON BAYAR ================= */}
 <button
-onClick={handlePayment}
+  onClick={handlePay}
   className="w-full h-[40px] flex items-center justify-center gap-2 text-white text-[14px] font-medium active:scale-[0.97] transition"
   style={{
     borderRadius: "34px",
     border: "1px solid #70B9FF",
-    background: "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
-    boxShadow: "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
+    background:
+      "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+    boxShadow:
+      "0 4px 4px 0 rgba(1, 101, 255, 0.20), 0 -4px 4px 0 rgba(255, 255, 255, 0.20) inset",
   }}
 >
   <img src={Wallet} className="w-[18px] h-[18px]" />
