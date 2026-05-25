@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WaterChart from "../../components/WaterChart";
 import AlertUsage from "../../components/AlertUsage";
@@ -17,6 +17,34 @@ export default function Home() {
   const navigate = useNavigate();
   const [chartType, setChartType] = useState<"line" | "graph">("line");
   const [activeTab, setActiveTab] = useState<"Harian" | "Mingguan" | "Bulanan">("Harian");
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+
+  const loadChart = async () => {
+
+    try {
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/dashboard/chart?range=${activeTab}`
+      );
+
+      const data = await response.json();
+
+      setChartData(data);
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+  loadChart();
+
+}, [activeTab]);
+console.log(chartData);
 
   const isAnomaly = true; // simulasi dari backend
 

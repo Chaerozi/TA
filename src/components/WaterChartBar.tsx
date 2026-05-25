@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -12,7 +13,7 @@ type ChartDatum = { x: string; value: number };
 
 const DATA_BY_RANGE: Record<ChartRange, ChartDatum[]> = {
   Harian: [
-    { x: "00:00", value: 8 },
+    { x: "00:00", value: 200 },
     { x: "03:00", value: 6 },
     { x: "06:00", value: 11 },
     { x: "09:00", value: 18 },
@@ -43,8 +44,42 @@ type WaterChartBarProps = {
 };
 
 export default function WaterChartBar({ range }: WaterChartBarProps) {
-  const data = DATA_BY_RANGE[range];
-  const maxValue = Math.max(...data.map((item) => item.value));
+  const [data, setData] = useState<ChartDatum[]>(
+    DATA_BY_RANGE[range]
+  );
+
+  useEffect(() => {
+
+  const loadChart = async () => {
+
+    try {
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/dashboard/chart?range=${range}`
+      );
+
+      const result = await response.json();
+
+      console.log("chart api:", result);
+
+      setData(result);
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+  loadChart();
+
+}, [range]);
+
+  const maxValue =
+  data.length > 0
+    ? Math.max(...data.map(item => item.value))
+    : 0;
   const yMax = Math.ceil((maxValue + 5) / 10) * 10;
 
   return (

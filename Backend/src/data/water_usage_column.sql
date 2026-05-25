@@ -51,7 +51,7 @@ ALTER TABLE public.water_usage OWNER TO postgres;
 -- Data for Name: water_usage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.water_usage (id_user, "UID", "flowRate", volume, forward, backward, cumulative, "timestamp", id) FROM stdin;
+COPY public.water_usage (user_id, "deviceId", "flowRate", volume, forward, backward, cumulative, "timestamp", id) FROM stdin;
 P0001	4898-9916-26	0	0	2845	\N	100494	2025-05-01 00:00:00	69aea09f-7748-419c-8599-4c45c39c5d73
 P0001	4898-9916-26	0	0	2873	\N	100494	2025-05-01 00:10:00	53f3cd56-2a87-472b-a038-67476249619e
 P0001	4898-9916-26	0	0	2847	\N	100494	2025-05-01 00:20:00	b8c6caf3-4129-4659-8776-f1d48e9d2535
