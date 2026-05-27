@@ -57,8 +57,7 @@ const handleLogin = async () => {
       JSON.stringify(response.data.user)
     );
 
-    // pindah ke connect meter
-    navigate("/connect-meter");
+    navigate("/home");
 
   } catch (error: any) {
 
@@ -74,19 +73,15 @@ const handleLogin = async () => {
 
 };
 
-  const handleClosePopup = () => {
-    const isSuccess = popup.type === "success";
+const handleClosePopup = () => {
 
-    setPopup({
-      open: false,
-      message: "",
-      type: "success",
-    });
+  setPopup({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
-    if (isSuccess) {
-      navigate("/connect-meter");
-    }
-  };
+};
 
   return (
     <>
@@ -183,9 +178,12 @@ const handleLogin = async () => {
               Ingat saya
             </label>
 
-            <a href="#" className="text-blue-600 font-medium">
-              Lupa kata sandi?
-            </a>
+           <span
+  onClick={() => navigate("/forgot-password")}
+  className="text-blue-600 font-medium cursor-pointer"
+>
+  Lupa kata sandi?
+</span>
           </div>
 
           {/* BUTTON */}
@@ -393,12 +391,18 @@ const handleLogin = async () => {
                 Ingat saya
               </label>
 
-              <a
-                href="#"
-                className="text-[16px] text-blue-600 font-medium hover:opacity-80"
-              >
-                Lupa kata sandi?
-              </a>
+             <span
+  onClick={() => navigate("/forgot-password")}
+  className="
+    text-[16px]
+    text-blue-600
+    font-medium
+    hover:opacity-80
+    cursor-pointer
+  "
+>
+  Lupa kata sandi?
+</span>
             </div>
 
             {/* BUTTON */}

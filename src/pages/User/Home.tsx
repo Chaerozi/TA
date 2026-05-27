@@ -10,6 +10,7 @@ import Graph from "../../assets/beranda/Graph.svg";
 import Line from "../../assets/beranda/Line.svg";
 import Persen from "../../assets/beranda/persen.svg";
 import LogoutIcon from "../../assets/beranda/Logout.svg";
+import IconLogout from "../../assets/beranda/IconLogout.svg";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -17,11 +18,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"Harian" | "Mingguan" | "Bulanan">("Harian");
   const [chartData, setChartData] = useState([]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  
+  const [showLogoutPopup, setShowLogoutPopup] =
+  useState(false);
 
   useEffect(() => {
     const loadChart = async () => {
@@ -41,7 +40,6 @@ export default function Home() {
 
   console.log(chartData);
 
-  const isAnomaly = true; // simulasi dari backend
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
@@ -61,7 +59,7 @@ export default function Home() {
             </h1>
 
             <button
-              onClick={handleLogout}
+  onClick={() => setShowLogoutPopup(true)}
               className="
                 absolute top-6 right-5
                 w-[46px] h-[46px]
@@ -215,7 +213,101 @@ export default function Home() {
 
           </div>
         </div>
+        
+{/* POPUP LOGOUT */}
+{showLogoutPopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4">
 
+    <div
+      className="
+        w-[272px]
+        h-[325.16px]
+        rounded-[12px]
+        bg-white
+        shadow-xl
+        px-6
+        pt-7
+      "
+    >
+
+      {/* ICON */}
+      <div className="flex justify-center">
+        <img
+          src={IconLogout}
+          alt="Logout"
+          className="w-[65.41px] h-[65.41px] object-contain"
+        />
+      </div>
+
+      {/* TITLE */}
+      <h2 className="mt-4 text-center text-[16px] font-bold text-[#1B2340]">
+        Keluar dari Akun?
+      </h2>
+
+      {/* DESC */}
+      <p className="mt-4 text-center text-[12px] leading-[14px] text-[#8B93A7]">
+        Anda akan keluar dari sesi saat ini dan
+        perlu masuk kembali untuk mengakses
+        akun Anda.
+      </p>
+
+    {/* BUTTON KELUAR */}
+<button
+  onClick={() => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+
+  }}
+  className="
+    mt-6
+    w-[220.19px]
+    h-[36.72px]
+    rounded-[34px]
+    mx-auto
+    block
+    text-white
+    text-[14px]
+    font-medium
+    transition-all
+    active:scale-[0.98]
+  "
+  style={{
+    background:
+      "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
+    boxShadow:
+      "0px 4px 4px rgba(1, 101, 255, 0.2), inset 0px -4px 4px rgba(255, 255, 255, 0.2)",
+  }}
+>
+  Keluar
+</button>
+
+{/* BUTTON BATAL */}
+<button
+  onClick={() => setShowLogoutPopup(false)}
+  className="
+    mt-4
+    w-[220.19px]
+    h-[36.72px]
+    rounded-[34px]
+    mx-auto
+    block
+    border
+    border-[#E5E7EB]
+    bg-white
+    text-[#1B2340]
+    text-[14px]
+    font-medium
+  "
+>
+  Batal
+</button>
+
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

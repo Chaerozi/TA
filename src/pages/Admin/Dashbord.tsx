@@ -11,8 +11,6 @@ import totalIcon    from "../../assets/adminDasbord/Total.svg"
 import konsumsiIcon from "../../assets/adminDasbord/Konsumsi.svg"
 import bulanIcon    from "../../assets/adminDasbord/Bulan.svg"
 import kelolaIcon   from "../../assets/adminDasbord/Kelola.svg"
-import smartIcon    from "../../assets/adminDasbord/Smart.svg"
-import succesIcon   from "../../assets/adminDasbord/Berhasil.svg"
 import notifIcon    from "../../assets/adminDasbord/Lonceng.svg"
 
 /* ===================== DATA ===================== */
@@ -77,105 +75,6 @@ function CustomTooltip({ active, payload, label }: any) {
   )
 }
 
-/* ===================== TAMBAH USER MODAL ===================== */
-function TambahUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (email: string) => void }) {
-  const [unit, setUnit]       = useState("")
-  const [email, setEmail]     = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState("")
-
-  const handleSubmit = async () => {
-    if (!unit)  { setError("Pilih unit terlebih dahulu."); return }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Masukkan email yang valid."); return }
-    setError(""); setLoading(true)
-    try {
-      const token = localStorage.getItem("token")
-      const res   = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ email, unit, name: "", role: "customer" }),
-      })
-      const data = await res.json()
-      if (!res.ok) { setError(data.message || "Gagal menambahkan user."); setLoading(false); return }
-      onSuccess(email)
-    } catch { setError("Gagal terhubung ke server. Coba lagi."); setLoading(false) }
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/25 backdrop-blur-[3px] flex items-center justify-center z-[999]" onClick={onClose}>
-      <div
-        className="w-[480px] bg-white rounded-[24px] p-7 shadow-[0_32px_80px_rgba(0,0,0,0.18)] relative"
-        onClick={e => e.stopPropagation()}
-      >
-        <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition text-gray-500 text-[14px]">✕</button>
-        <h2 className="text-[20px] font-bold text-gray-900 mb-1">Tambah User</h2>
-       
-        <div className="space-y-4 mt-5">
-          <div>
-            <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 tracking-wide block">Pilih Unit</label>
-            <div className="relative">
-              <select value={unit} onChange={e => { setUnit(e.target.value); setError("") }}
-                className="w-full h-[48px] px-4 pr-10 rounded-[14px] border border-gray-200 text-[14px] text-gray-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition appearance-none bg-white cursor-pointer">
-                <option value="">Pilih unit</option>
-                {UNIT_LIST.map(u => <option key={u} value={u}>{u}</option>)}
-              </select>
-              <svg className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
-            </div>
-          </div>
-          <div>
-            <label className="text-[12px] font-bold text-gray-600 uppercase tracking-wide mb-2 block">Email Pengguna Baru</label>
-            <input type="email" placeholder="Masukan email" value={email}
-              onChange={e => { setEmail(e.target.value); setError("") }}
-              onKeyDown={e => e.key === "Enter" && handleSubmit()}
-              className="w-full h-[48px] px-4 rounded-[14px] border border-gray-200 text-[14px] text-gray-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition placeholder:text-gray-300" />
-          </div>
-          {error && (
-            <div className="flex items-center gap-2.5 bg-red-50 border border-red-100 rounded-[12px] px-4 py-3">
-              <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg>
-              <p className="text-[12px] text-red-600">{error}</p>
-            </div>
-          )}
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.25)" }}
-          >
-            {loading ? "Menambahkan..." : "Tambah User"}
-          </button>
-        </div>
-        
-      </div>
-      
-    </div>
-    
-  )
-}
-
-
-/* ===================== SUCCESS MODAL ===================== */
-function SuccessModal({ email, onClose }: { email: string; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 bg-black/25 backdrop-blur-[3px] flex items-center justify-center z-[999]" onClick={onClose}>
-      <div className="w-[400px] bg-white rounded-[24px] p-8 text-center shadow-[0_32px_80px_rgba(0,0,0,0.15)]" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-center mb-5"><img src={succesIcon} className="w-[72px]" alt="success" /></div>
-        <h2 className="text-[20px] font-bold text-gray-900 mb-2">Akun berhasil ditambahkan!</h2>
-        <p className="text-[13px] text-gray-400 mb-1">Email aktivasi telah dikirim ke:</p>
-        <p className="text-[14px] font-semibold text-blue-600 mb-4 break-all">{email}</p>
-        <p className="text-[13px] text-gray-400 mb-7 leading-relaxed">
-          Minta pengguna cek inbox-nya dan buat kata sandi untuk mengaktifkan akun.
-        </p>
-
-        <button onClick={onClose}
-          className="w-full h-[50px] rounded-[14px] text-white text-[14px] font-semibold transition-all active:scale-[0.97]"
-          style={{ background: "linear-gradient(135deg, #0096FF 0%, #0022FF 100%)", boxShadow: "0 8px 24px rgba(0,34,255,0.25)" }}>
-          Selesai
-        </button>
-      </div>
-    </div>
-  )
-}
-
 /* ===================== STAT CARD ===================== */
 type StatCardProps = {
   title: string
@@ -231,10 +130,6 @@ export default function Dashboard() {
   const [filterStatus, setFilterStatus]   = useState<FilterType>("All")
   const [filterOpen, setFilterOpen]       = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
-
-  const [openModal, setOpenModal]       = useState(false)
-  const [successModal, setSuccessModal] = useState(false)
-  const [addedEmail, setAddedEmail]     = useState("")
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -322,15 +217,6 @@ export default function Dashboard() {
         <button className="w-[200px] h-[53px] rounded-[34px] bg-white border border-[#E4E7EC] flex items-center justify-center gap-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] hover:bg-gray-50 transition-all">
           <img src={kelolaIcon} className="w-[18px] h-[18px] opacity-70" alt="kelola" />
           <span className="text-[14px] font-medium text-[#344054]">Kelola Harga Air</span>
-        </button>
-
-        <button
-          onClick={() => setOpenModal(true)}
-          className="w-[178px] h-[53px] rounded-[34px] flex items-center justify-center gap-3 text-white transition-all active:scale-[0.98] hover:shadow-[0_10px_30px_rgba(0,52,255,0.35)]"
-          style={{ background: "linear-gradient(90deg, #0034FF 0%, #3FACFF 100%)", boxShadow: "0 8px 24px rgba(0,52,255,0.25)" }}
-        >
-          <span className="text-[32px] leading-none font-light mb-[2px]">+</span>
-          <span className="text-[14px] font-medium tracking-[-0.01em]">Tambah User</span>
         </button>
       </div>
 
@@ -467,25 +353,6 @@ export default function Dashboard() {
         {/* ===== RIGHT COLUMN ===== */}
         <div className="space-y-4">
 
-           {/* SMART ALERTS */}
-          <div
-            className="rounded-[20px] p-5 flex flex-col gap-3 relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #1E90FF 0%, #0022FF 100%)",
-              boxShadow: "0 8px 32px rgba(0,34,255,0.28)",
-            }}
-          >
-            {/* decorative blob */}
-           <img src={smartIcon} className="absolute -top-4 -right-4 w-[184px] opacity-28 pointer-events-none z-0" />
-            <p className="text-[14px] font-semibold text-white relative z-10">Smart Alerts</p>
-            <div className="bg-blue-400/50 rounded-[10px] h-[44px] flex items-center justify-center relative z-10">
-              <p className="text-[13px] text-white font-medium">3 anomali terdeteksi hari ini</p>
-            </div>
-            <button className="w-full h-[44px] bg-white rounded-[999px] text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition active:scale-[0.98] relative z-10">
-              Lihat detail
-            </button>
-          </div>
-
           {/* PIE CHART */}
           <div className="w-full h-[464px] rounded-[20px] border border-[#EEF2F6] bg-white px-6 pt-7 pb-6 flex flex-col shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
             <h3 className="text-[16px] leading-[24px] font-medium text-[#344054] mb-[34px]">
@@ -540,15 +407,6 @@ export default function Dashboard() {
 
         </div>
       </div>
-
-      {/* ── MODALS ── */}
-      {openModal && (
-        <TambahUserModal
-          onClose={() => setOpenModal(false)}
-          onSuccess={email => { setAddedEmail(email); setOpenModal(false); setSuccessModal(true) }}
-        />
-      )}
-      {successModal && <SuccessModal email={addedEmail} onClose={() => setSuccessModal(false)} />}
 
     </div>
   )

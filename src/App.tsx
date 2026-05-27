@@ -13,6 +13,8 @@ import PaymentSuccess from "./pages/User/PaymentSuccess"
 import Register from "./pages/User/Register"
 import ActivateAccount from "./components/ActivateAccount"
 import ProtectedRoute from "./components/ProtectRoute";
+import ForgotPassword from "./pages/User/ForgotPassword"
+import ResetPassword from "./pages/User/ResetPassword";
 
 // ADMIN
 import Dashboard from "./pages/Admin/Dashbord"
@@ -34,6 +36,14 @@ export default function App() {
   element={<ActivateAccount />}
 />
       <Route path="/login" element={<Login />} />
+      <Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+<Route
+  path="/reset-password"
+  element={<ResetPassword />}
+/>
       <Route
   path="/home"
   element={
