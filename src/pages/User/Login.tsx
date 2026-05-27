@@ -1,4 +1,4 @@
-import { useState } from "react";
+import  {useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -9,13 +9,18 @@ import Teks from "../../assets/adminDasbord/Logo.svg";
 import Berhasil from "../../assets/adminDasbord/Berhasil.svg";
 
 export default function Login() {
-  const [remember, setRemember] = useState(false);
+
   const navigate = useNavigate();
+
   const location = useLocation();
 
-const [showActivatedPopup, setShowActivatedPopup] =
-  useState(location.state?.activated || false);
+  const [remember, setRemember] = useState(false);
+
+  const [showActivatedPopup, setShowActivatedPopup] =
+    useState(location.state?.activated || false);
+
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
 
   const [popup, setPopup] = useState<{
@@ -28,44 +33,46 @@ const [showActivatedPopup, setShowActivatedPopup] =
     type: "success",
   });
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/login",
-        {
-          email,
-          password,
-        }
-      );
+const handleLogin = async () => {
 
-      // simpan token login
-      localStorage.setItem(
-        "token",
-        response.data.data.token
-      );
+  try {
 
-      // simpan data user
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.data.user)
-      );
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/auth/login",
+      {
+        email,
+        password,
+      }
+    );
 
-      setPopup({
-        open: true,
-        message: "Login berhasil",
-        type: "success",
-      });
+    // simpan token
+    localStorage.setItem(
+      "token",
+      response.data.token
+    );
 
-    } catch (error: any) {
-      setPopup({
-        open: true,
-        message:
-          error.response?.data?.message ||
-          "Login gagal",
-        type: "error",
-      });
-    }
-  };
+    // simpan user
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+
+    // pindah ke connect meter
+    navigate("/connect-meter");
+
+  } catch (error: any) {
+
+    setPopup({
+      open: true,
+      message:
+        error.response?.data?.message ||
+        "Login gagal",
+      type: "error",
+    });
+
+  }
+
+};
 
   const handleClosePopup = () => {
     const isSuccess = popup.type === "success";
@@ -77,7 +84,7 @@ const [showActivatedPopup, setShowActivatedPopup] =
     });
 
     if (isSuccess) {
-      navigate("/home");
+      navigate("/connect-meter");
     }
   };
 
@@ -200,14 +207,18 @@ const [showActivatedPopup, setShowActivatedPopup] =
             Masuk
           </button>
 
-          {/* REGISTER */}
-          <p className="text-center text-[13px] text-[#334155] mt-6">
-            Belum punya akun?{" "}
-            <span className="text-blue-600 font-medium cursor-pointer">
-              Daftar
-            </span>
-          </p>
+       {/* REGISTER */}
+<p className="text-center text-[13px] text-[#334155] mt-6">
+  Belum punya akun?{" "}
 
+  <button
+    type="button"
+    onClick={() => navigate("/register")}
+    className="text-blue-600 font-medium"
+  >
+    Daftar
+  </button>
+</p>
         </div>
       </div>
       {/* ================= POPUP ================= */}
@@ -256,6 +267,7 @@ const [showActivatedPopup, setShowActivatedPopup] =
           </div>
         </div>
       )}
+
 {/* POPUP BERHASIL */}
 {showActivatedPopup && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-6">
@@ -283,7 +295,9 @@ const [showActivatedPopup, setShowActivatedPopup] =
 
       {/* BUTTON */}
       <button
-        onClick={() => setShowActivatedPopup(false)}
+        onClick={() => {
+          setShowActivatedPopup(false);
+        }}
         className="
           mt-6
           h-[40px]
@@ -304,10 +318,10 @@ const [showActivatedPopup, setShowActivatedPopup] =
       >
         Masuk
       </button>
+
     </div>
   </div>
 )}
-
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:flex min-h-screen bg-[#F3F4F6] font-geist">
 
@@ -405,13 +419,18 @@ const [showActivatedPopup, setShowActivatedPopup] =
             >
               Masuk
             </button>
+{/* REGISTER */}
+<p className="text-center text-[13px] text-[#334155] mt-6">
+  Belum punya akun?{" "}
 
-            <p className="text-center text-[16px] text-[#334155] mt-8">
-              Belum punya akun?{" "}
-              <span className="text-blue-600 font-medium cursor-pointer">
-                Daftar
-              </span>
-            </p>
+  <button
+    type="button"
+    onClick={() => navigate("/register")}
+    className="text-blue-600 font-medium"
+  >
+    Daftar
+  </button>
+</p>
 
           </div>
         </div>

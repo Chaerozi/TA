@@ -1,15 +1,89 @@
 import Gedung from "../../assets/Login/New.svg";
 import Teks from "../../assets/Login/TeksAquora.svg";
 import Logo from "../../assets/adminDasbord/Logo.svg";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+    phone: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleRegister = async () => {
+
+    try {
+
+      // Validasi password
+      if (
+        formData.password !== formData.confirmPassword
+      ) {
+        alert("Konfirmasi password tidak sama");
+        return;
+      }
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+
+        alert("Register berhasil");
+
+        navigate("/login", {
+          state: {
+            activated: true,
+          },
+        });
+
+      } else {
+
+        alert(result.message);
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Terjadi kesalahan");
+
+    }
+
+  };
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] flex items-start justify-center md:py-10">
-      
-      {/* MOBILE FRAME — max-w membatasi lebar di web, full di mobile */}
+
       <div className="w-full max-w-[430px] min-h-screen md:min-h-0 md:overflow-hidden md:shadow-[0_32px_80px_rgba(0,0,0,0.25)] bg-[#F3F4F6]">
 
         {/* HEADER */}
@@ -17,7 +91,11 @@ export default function Register() {
 
           {/* LOGO */}
           <div className="mt-2 mb-2">
-            <img src={Teks} alt="Aquora Logo" className="h-7 w-auto object-contain" />
+            <img
+              src={Teks}
+              alt="Aquora Logo"
+              className="h-7 w-auto object-contain"
+            />
           </div>
 
           {/* DESCRIPTION */}
@@ -36,9 +114,10 @@ export default function Register() {
               className="w-full h-full object-contain"
             />
           </div>
+
         </div>
 
-        {/* FORM SECTION */}
+        {/* FORM */}
         <div className="relative z-20 -mt-[24px] rounded-t-[12px] bg-[#F3F4F6] px-4 pt-8 pb-10">
 
           {/* ICON */}
@@ -60,7 +139,7 @@ export default function Register() {
             Silakan buat akun untuk mulai menggunakan Aquora.
           </p>
 
-          {/* FORM */}
+          {/* FORM INPUT */}
           <div className="mt-8 space-y-5">
 
             {/* NAMA */}
@@ -68,10 +147,14 @@ export default function Register() {
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Nama
               </label>
+
               <input
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 placeholder="Masukan nama lengkap"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
 
@@ -80,10 +163,14 @@ export default function Register() {
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Email
               </label>
+
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Masukan email"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
 
@@ -92,22 +179,30 @@ export default function Register() {
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Kata Sandi
               </label>
+
               <input
                 type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Masukan kata sandi"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
 
-            {/* KONFIRMASI PASSWORD */}
+            {/* CONFIRM PASSWORD */}
             <div>
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Konfirmasi Kata Sandi
               </label>
+
               <input
                 type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 placeholder="Konfirmasi kata sandi"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
 
@@ -116,10 +211,14 @@ export default function Register() {
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Alamat
               </label>
+
               <input
                 type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
                 placeholder="Masukan alamat"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
 
@@ -128,21 +227,22 @@ export default function Register() {
               <label className="block text-[14px] font-semibold text-[#1B2340] mb-2">
                 Nomor HP
               </label>
+
               <input
                 type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
                 placeholder="Masukan nomor HP"
-                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] text-[#1B2340] placeholder:text-[#A0AEC0] outline-none transition-all focus:border-[#2563FF]"
+                className="w-full h-[48px] rounded-[12px] border border-[#D9E0EE] bg-white px-4 text-[14px] outline-none focus:border-[#2563FF]"
               />
             </div>
+
           </div>
 
           {/* BUTTON */}
           <button
-            onClick={() =>
-              navigate("/login", {
-                state: { activated: true },
-              })
-            }
+            onClick={handleRegister}
             className="w-full h-[48px] rounded-[34px] flex items-center justify-center text-white text-[14px] font-semibold mt-8 transition-all active:scale-[0.98]"
             style={{
               background:
@@ -152,8 +252,9 @@ export default function Register() {
               border: "1px solid #70B9FF",
             }}
           >
-            Aktivasi &amp; Masuk
+            Daftar
           </button>
+
         </div>
       </div>
     </div>

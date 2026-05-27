@@ -11,8 +11,8 @@ import MetodePembayaran from "./pages/User/MetodePembayaran"
 import Payment from "./pages/User/Payment"
 import PaymentSuccess from "./pages/User/PaymentSuccess"
 import Register from "./pages/User/Register"
-import ConnectMeter from "./pages/User/ConnectMeter"
 import ActivateAccount from "./components/ActivateAccount"
+import ProtectedRoute from "./components/ProtectRoute";
 
 // ADMIN
 import Dashboard from "./pages/Admin/Dashbord"
@@ -29,14 +29,19 @@ export default function App() {
       {/* USER */}
     <Route path="/register" element={<Register />} />
      <Route path="/" element={<Login />} />
-     <Route path="/connect-meter" element={<ConnectMeter />} />
-
 <Route
   path="/activate-account"
   element={<ActivateAccount />}
 />
       <Route path="/login" element={<Login />} />
-      <Route path="/home" element={<Home />} />
+      <Route
+  path="/home"
+  element={
+    <ProtectedRoute>
+      <Home />
+    </ProtectedRoute>
+  }
+/>
       <Route path="/bayar-tagihan" element={<BayarTagihan />} />
       <Route path="/metode-pembayaran" element={<MetodePembayaran />} />
       <Route path="/qris-payment" element={<Payment />} />
