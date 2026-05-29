@@ -8,7 +8,7 @@ import {
   Area,
   Tooltip,
 } from "recharts";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 
 type ChartRange = "Harian" | "Mingguan" | "Bulanan";
 
@@ -122,14 +122,74 @@ type WaterChartProps = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function WaterChart({ range = "Mingguan" }: WaterChartProps) {
-  const chartData: IndexedChartDatum[] = useMemo(
-    () =>
-      (DATA_BY_RANGE[range] ?? DATA_BY_RANGE["Mingguan"]).map((item, idx) => ({
-        ...item,
-        idx,
-      })),
-    [range]
+  const [apiData, setApiData] =
+    useState<ChartDatum[]>(
+      DATA_BY_RANGE[range]
+    );
+
+useEffect(() => {
+
+    const loadChart = async () => {
+
+      try {
+
+        const token =
+  localStorage.getItem("token");
+
+if (!token) return;
+
+const response = await fetch(
+  `http://localhost:3000/api/v1/dashboard/chart?range=${range}`,
+  {
+    headers: {
+      Authorization:
+        `Bearer ${token}`
+    }
+  }
+);
+
+if (!response.ok) {
+  throw new Error(
+    `HTTP ${response.status}`
   );
+}
+
+        const result =
+          await response.json();
+
+        console.log("line chart:", result);
+
+        const transformed =
+          result.map((item: any) => ({
+            x: item.x,
+            value: item.value,
+
+            // untuk background bar abu-abu
+            bar: item.value
+          }));
+
+        setApiData(transformed);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    };
+
+    loadChart();
+
+  }, [range]);
+
+  const chartData: IndexedChartDatum[] = useMemo(
+  () =>
+    apiData.map((item, idx) => ({
+      ...item,
+      idx,
+    })),
+  [apiData]
+);
 
   const maxValue = Math.max(...chartData.map((d) => d.value), 10);
 
@@ -194,13 +254,20 @@ export default function WaterChart({ range = "Mingguan" }: WaterChartProps) {
             tick={{ fontSize: 11, fill: "#9CA3AF" }}
           />
 
-          <YAxis
-            orientation="right"
-            domain={[0, maxValue + 10]}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#9CA3AF" }}
-          />
+<YAxis
+  orientation="right"
+  domain={
+  range === "Harian" || range === "Mingguan"
+    ? [
+        (dataMin) => dataMin - 1,
+        (dataMax) => dataMax + 1
+      ]
+    : [0, maxValue + 10]
+}
+  axisLine={false}
+  tickLine={false}
+  tick={{ fontSize: 11, fill: "#9CA3AF" }}
+/>
         </ComposedChart>
       </ResponsiveContainer>
     </div>

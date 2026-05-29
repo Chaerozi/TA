@@ -8,115 +8,8 @@ import Lewat from "../../assets/AdminBilling/JatuhTempo.svg"
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
-const BILLING_DATA = [
-  {
-    id: "INV-2602-001",
-    unit: "Unit 101",
-    email: "christianbryan263@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Lunas",
-    tglBayar: "15 Apr 2026",
-  },
-  {
-    id: "INV-2602-002",
-    unit: "Unit 102",
-    email: "sariindah@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Lunas",
-    tglBayar: "12 Apr 2026",
-  },
-  {
-    id: "INV-2602-003",
-    unit: "Unit 103",
-    email: "bagusprasetyo@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Belum Dibayar",
-    tglBayar: "-",
-  },
-  {
-    id: "INV-2602-004",
-    unit: "Unit 104",
-    email: "dewirahayu@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Lunas",
-    tglBayar: "18 Apr 2026",
-  },
-  {
-    id: "INV-2602-005",
-    unit: "Unit 105",
-    email: "rizkyfirmansyah@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Lunas",
-    tglBayar: "14 Apr 2026",
-  },
-  {
-    id: "INV-2602-006",
-    unit: "Unit 106",
-    email: "annisaputri@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Belum Dibayar",
-    tglBayar: "-",
-  },
-  {
-    id: "INV-2602-007",
-    unit: "Unit 107",
-    email: "hendrawijaya@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Lunas",
-    tglBayar: "10 Apr 2026",
-  },
-  {
-    id: "INV-2602-008",
-    unit: "Unit 108",
-    email: "mayasari@gmail.com",
-    terbit: "5 Apr 2026",
-    jatuhTempo: "20 Apr 2026",
-    status: "Belum Dibayar",
-    tglBayar: "-",
-  },
-]
 
-const STAT_CARDS = [
-  {
-    label: "Total Tagihan Terbit",
-    value: "Rp 1.585.000",
-    sub: "8 faktur",
-    color: "#344054",
-    iconBg: "#F2F4F7",
-    icon: totalIcon,
-  },
-  {
-    label: "Sudah Terbayar",
-    value: "Rp 557.000",
-    sub: "3 unit lunas",
-    color: "#48A65A",
-    iconBg: "#D9F2DF",
-    icon: bayar,
-  },
-  {
-    label: "Belum Terbayar",
-    value: "Rp 650.000",
-    sub: "3 unit menunggak",
-    color: "#E79B23",
-    iconBg: "#FCE8C4",
-    icon: Belum,
-  },
-  {
-    label: "Lewat Jatuh Tempo",
-    value: "Rp 378.000",
-    sub: "2 unit overdue",
-    color: "#C9372C",
-    iconBg: "#F9E0DF",
-    icon: Lewat,
-  },
-]
+
 
 const TABLE_HEADERS = [
   "ID Faktur",
@@ -129,7 +22,7 @@ const TABLE_HEADERS = [
 
 const STATUS_OPTIONS = ["Semua Status", "Lunas", "Belum Dibayar"] as const
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -194,6 +87,80 @@ export default function Billing() {
   const [page, setPage] = useState(1)
 
   const statusRef = useRef<HTMLDivElement>(null)
+  const [stats, setStats] =
+  useState<any>(null)
+  const [billingData, setBillingData] =
+  useState<any[]>([])
+  useEffect(() => {
+
+    const fetchBillingTable =
+  async () => {
+
+  try {
+
+    const token =
+      localStorage.getItem("token")
+
+    const response =
+      await fetch(
+        "http://localhost:3000/api/v1/admin/billing-table",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      )
+
+    const result =
+      await response.json()
+
+    setBillingData(result)
+
+  } catch (error) {
+
+    console.error(error)
+
+  }
+
+}
+fetchBillingTable()
+
+  const fetchStats =
+    async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token")
+
+      const response =
+        await fetch(
+          "http://localhost:3000/api/v1/admin/billing-stats",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        )
+
+      const result =
+        await response.json()
+
+      setStats(result)
+
+    } catch (error) {
+
+      console.error(error)
+
+    }
+
+  }
+
+  fetchStats()
+
+}, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -207,16 +174,46 @@ export default function Billing() {
   }, [])
 
   // Filter data
-  const filtered = BILLING_DATA.filter(({ unit, email, id, status }) => {
-    const q = search.toLowerCase()
-    const matchSearch =
-      unit.toLowerCase().includes(q) ||
-      email.toLowerCase().includes(q) ||
-      id.toLowerCase().includes(q)
-    const matchStatus =
-      statusFilter === "Semua Status" || status === statusFilter
-    return matchSearch && matchStatus
-  })
+  const filtered =
+  billingData.filter(
+    ({
+      unit,
+      email,
+      id,
+      status
+    }) => {
+
+      const q =
+        search.toLowerCase()
+
+      const matchSearch =
+
+        unit
+          .toLowerCase()
+          .includes(q) ||
+
+        email
+          .toLowerCase()
+          .includes(q) ||
+
+        id
+          .toLowerCase()
+          .includes(q)
+
+      const matchStatus =
+
+        statusFilter ===
+          "Semua Status" ||
+
+        status ===
+          statusFilter
+
+      return (
+        matchSearch &&
+        matchStatus
+      )
+
+})
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentRows = filtered.slice(
@@ -269,9 +266,93 @@ export default function Billing() {
 
       {/* ── STAT CARDS ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {STAT_CARDS.map((card) => (
-          <StatCard key={card.label} {...card} />
-        ))}
+        {stats && (
+
+  <>
+
+    <StatCard
+      label="Total Tagihan Terbit"
+      value={
+        new Intl.NumberFormat(
+          "id-ID",
+          {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+          }
+        ).format(
+          stats.total.amount
+        )
+      }
+      sub={`${stats.total.count} tagihan`}
+      color="#344054"
+      iconBg="#F2F4F7"
+      icon={totalIcon}
+    />
+
+    <StatCard
+      label="Sudah Terbayar"
+      value={
+        new Intl.NumberFormat(
+          "id-ID",
+          {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+          }
+        ).format(
+          stats.paid.amount
+        )
+      }
+      sub={`${stats.paid.count} tagihan`}
+      color="#48A65A"
+      iconBg="#D9F2DF"
+      icon={bayar}
+    />
+
+    <StatCard
+      label="Belum Terbayar"
+      value={
+        new Intl.NumberFormat(
+          "id-ID",
+          {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+          }
+        ).format(
+          stats.unpaid.amount
+        )
+      }
+      sub={`${stats.unpaid.count} tagihan menunggak`}
+      color="#E79B23"
+      iconBg="#FCE8C4"
+      icon={Belum}
+    />
+
+    <StatCard
+      label="Lewat Jatuh Tempo"
+      value={
+        new Intl.NumberFormat(
+          "id-ID",
+          {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+          }
+        ).format(
+          stats.overdue.amount
+        )
+      }
+      sub={`${stats.overdue.count} tagihan lewat tempo`}
+      color="#C9372C"
+      iconBg="#F9E0DF"
+      icon={Lewat}
+    />
+
+  </>
+
+)}
       </div>
 
       {/* ── COLLECTION PROGRESS ────────────────────────────────────────────── */}
@@ -282,11 +363,18 @@ export default function Billing() {
               Rekap Collection Period
             </h3>
             <p className="text-[16px] text-[#98A2B3] mt-[2px]">
-              Februari 2026
+              {new Date().toLocaleDateString(
+  "id-ID",
+  {
+    month: "long",
+    year: "numeric"
+  }
+)}
             </p>
           </div>
           <p className="text-[16px] font-medium text-[#2481FF]">
-            35% terkumpul
+            {stats?.collection?.percentage
+  ?.toFixed(1)}% terkumpul
           </p>
         </div>
 
@@ -294,7 +382,8 @@ export default function Billing() {
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
-              width: "35%",
+              width:
+  `${stats?.collection?.percentage || 0}%`,
               background: "linear-gradient(90deg, #4DA1FF 0%, #002BFF 100%)",
             }}
           />
@@ -302,7 +391,27 @@ export default function Billing() {
 
         <div className="flex justify-end mt-4">
           <p className="text-[14px] sm:text-[16px] text-[#98A2B3]">
-            Rp 557.000 / Rp 1.585.000
+            {new Intl.NumberFormat(
+  "id-ID",
+  {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }
+).format(
+  stats?.collection?.paid || 0
+)}
+{" / "}
+{new Intl.NumberFormat(
+  "id-ID",
+  {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }
+).format(
+  stats?.collection?.total || 0
+)}
           </p>
         </div>
       </div>

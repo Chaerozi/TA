@@ -17,16 +17,87 @@ export default function Home() {
   const [chartType, setChartType] = useState<"line" | "graph">("line");
   const [activeTab, setActiveTab] = useState<"Harian" | "Mingguan" | "Bulanan">("Harian");
   const [chartData, setChartData] = useState([]);
-
+  const [userName, setUserName] = useState("");
+  const [monthlyVolume, setMonthlyVolume] =
+  useState(0);
+  const [monthlyDifference, setMonthlyDifference] =
+  useState(0);
+  const [estimatedBill, setEstimatedBill] =
+  useState(0);
   
   const [showLogoutPopup, setShowLogoutPopup] =
   useState(false);
 
   useEffect(() => {
+
+    const loadMonthlyVolume =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem("token");
+
+        const response =
+          await fetch(
+            "http://localhost:3000/api/v1/dashboard/monthly-volume",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        const result =
+          await response.json();
+
+        setMonthlyVolume(
+          result.currentVolume
+        );
+
+        setMonthlyDifference(
+  result.difference
+);
+
+        setEstimatedBill(
+          result.estimatedBill
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    };
+
+  loadMonthlyVolume();
+
+const user =
+      localStorage.getItem("user");
+
+    if (user) {
+
+      const parsedUser =
+        JSON.parse(user);
+
+      setUserName(
+        parsedUser.name
+      );
+
+    }
+
     const loadChart = async () => {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:3000/api/v1/dashboard/chart?range=${activeTab}`
+          `http://localhost:3000/api/v1/dashboard/chart?range=${activeTab}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         const data = await response.json();
         setChartData(data);
@@ -40,6 +111,33 @@ export default function Home() {
 
   console.log(chartData);
 
+const nextMonthDate =
+    new Date();
+
+  nextMonthDate.setMonth(
+    nextMonthDate.getMonth() + 1
+  );
+
+  nextMonthDate.setDate(1);
+
+  const dueDateText =
+    nextMonthDate.toLocaleDateString(
+      "id-ID",
+      {
+        day: "numeric",
+        month: "short",
+      }
+    );
+
+const formattedBill =
+  new Intl.NumberFormat(
+    "id-ID",
+    {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    }
+  ).format(estimatedBill);
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
@@ -55,7 +153,7 @@ export default function Home() {
 
           <div className="flex justify-between items-center mt-0">
             <h1 className="text-[24px] font-semibold tracking-tight">
-              Ardhika 👋
+              {userName}
             </h1>
 
             <button
@@ -81,13 +179,23 @@ export default function Home() {
                 <img src={Air} className="w-[30px] h-[30px]" />
                 <div className="flex items-center h-[22px] bg-blue-50 text-blue-600 rounded-[8px] px-[8px]">
                   <span className="text-[9px] font-semibold whitespace-nowrap">
-                    Rata-rata 0.4 m³/hari
+                    Rata-rata {(monthlyVolume / 30000).toFixed(1)} m³/hari
                   </span>
                 </div>
               </div>
               <p className="text-gray-400 text-[10px]">Pemakaian Bulan Ini</p>
-              <h2 className="text-[22px] font-bold mt-1 text-gray-900">12.4 m³</h2>
-              <p className="text-green-500 text-[10px] font-semibold mt-2">↑ 18% dari bulan lalu</p>
+              <h2 className="text-[22px] font-bold mt-1 text-gray-900">{(monthlyVolume/1000).toFixed(1)} m³</h2>
+              <p
+  className={`text-[10px] font-semibold mt-2 ${
+    monthlyDifference >= 0
+      ? "text-green-500"
+      : "text-red-500"
+  }`}
+>
+  {monthlyDifference >= 0 ? "↑" : "↓"}{" "}
+  {(Math.abs(monthlyDifference)/1000).toFixed(1)} m³
+  dari bulan lalu
+</p>
             </div>
 
             {/* Card Tagihan */}
@@ -101,8 +209,8 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-400 text-[10px]">Tagihan Berjalan</p>
-              <h2 className="text-[22px] font-bold mt-1 text-gray-900">Rp 185.000</h2>
-              <p className="text-[10px] font-semibold text-gray-500 mt-2">Jatuh tempo 25 Jan</p>
+              <h2 className="text-[22px] font-bold mt-1 text-gray-900">{formattedBill}</h2>
+              <p className="text-[10px] font-semibold text-gray-500 mt-2">Jatuh tempo {dueDateText}</p>
             </div>
 
           </div>
@@ -193,11 +301,19 @@ export default function Home() {
             <div className="mt-5">
               <p className="text-[12px] text-gray-400">Pemakaian Air Bersih</p>
               <div className="flex items-center gap-3 mt-1">
-                <h2 className="text-[30px] font-bold text-gray-900">12.4 m³</h2>
+                <h2 className="text-[30px] font-bold text-gray-900">{(monthlyVolume/1000).toFixed(1)} m³</h2>
                 <div className="flex items-center gap-1">
-                  <span className="text-green-500 text-[12px] font-semibold">
-                    +12% dari bulan lalu
-                  </span>
+                  <span
+  className={`text-[10px] font-semibold mt-2 ${
+    monthlyDifference >= 0
+      ? "text-green-500"
+      : "text-red-500"
+  }`}
+>
+  {monthlyDifference >= 0 ? "↑" : "↓"}{" "}
+  {(Math.abs(monthlyDifference)/1000).toFixed(1)} m³
+  dari bulan lalu
+</span>
                   <img src={Persen} className="w-[14px]" />
                 </div>
               </div>

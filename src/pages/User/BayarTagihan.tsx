@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -9,6 +10,79 @@ import Unduh from "../../assets/Tagihan/Unduh.svg";
 export default function BayarTagihan() {
 
   const navigate = useNavigate();
+  const [monthlyVolume, setMonthlyVolume] =
+  useState(0);
+
+const [unitPrice, setUnitPrice] =
+  useState(0);
+
+const [historyBills, setHistoryBills] =
+  useState<any[]>([]);
+
+  useEffect(() => {
+
+  const loadBillData = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      // DASHBOARD
+      const dashboardResponse =
+        await fetch(
+          "http://localhost:3000/api/v1/dashboard/monthly-volume",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      const dashboardData =
+        await dashboardResponse.json();
+
+      setMonthlyVolume(
+        dashboardData.currentVolume
+      );
+
+      setUnitPrice(
+        dashboardData.unitPrice
+      );
+
+      // USER
+      const user =
+        JSON.parse(
+          localStorage.getItem("user") || "{}"
+        );
+        console.log(user);
+
+      // BILL HISTORY
+      const billsResponse =
+        await fetch(
+          `http://localhost:3000/api/v1/billing/user/${user.id}`
+        );
+
+      const billsData =
+        await billsResponse.json();
+        console.log(billsData);
+
+      setHistoryBills(
+        billsData.data.slice(0, 3)
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+  loadBillData();
+
+}, []);
 
 const handlePay = async () => {
   try {
@@ -30,6 +104,64 @@ const handlePay = async () => {
     alert("Gagal membuat pembayaran");
   }
 };
+const adminFee = 2500;
+
+const waterPrice =
+  monthlyVolume * unitPrice;
+
+const tax =
+  waterPrice * 0.1;
+
+const penalty = 0;
+
+const totalPayment =
+  waterPrice +
+  adminFee +
+  tax +
+  penalty;
+  const dueDate =
+  new Date();
+
+dueDate.setMonth(
+  dueDate.getMonth() + 1
+);
+
+dueDate.setDate(1);
+
+const formattedDueDate =
+  dueDate.toLocaleDateString(
+    "id-ID",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }
+  );
+  const rupiah = (value: number) =>
+  new Intl.NumberFormat(
+    "id-ID",
+    {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    }
+  ).format(value);
+  const now = new Date();
+
+const currentMonthYear =
+  now.toLocaleDateString(
+    "id-ID",
+    {
+      month: "long",
+      year: "numeric"
+    }
+  );
+  const lastDayOfMonth =
+  new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0
+  ).getDate();
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
       <div className="w-full max-w-[430px] min-h-screen bg-[#F3F4F6] shadow-sm relative px-4 pt-10 pb-10">
@@ -63,11 +195,11 @@ const handlePay = async () => {
 
   <div>
     <h2 className="text-[16px] font-semibold">
-      Tagihan Januari 2026
+      Tagihan {currentMonthYear}
     </h2>
 
     <p className="text-[12px] text-gray-400">
-      Periode: 1 – 31 Januari 2026
+      Periode: 1 – {lastDayOfMonth} {" "} {currentMonthYear}
     </p>
   </div>
 
@@ -79,7 +211,7 @@ const handlePay = async () => {
 
           <div>
             <p className="text-gray-400">Jatuh Tempo</p>
-            <p className="font-semibold">25 Jan 2026</p>
+            <p className="font-semibold">{formattedDueDate}</p>
           </div>
 
           <div>
@@ -89,22 +221,22 @@ const handlePay = async () => {
 
           <div>
             <p className="text-gray-400">Pemakaian</p>
-            <p className="font-semibold">12.4 m³</p>
+            <p className="font-semibold">{(monthlyVolume / 1000).toFixed(1)} m³</p>
           </div>
 
           <div>
             <p className="text-gray-400">Pajak</p>
-            <p className="font-semibold">Rp 18.700</p>
+            <p className="font-semibold">{rupiah(tax/1000)}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Harga /m³</p>
-            <p className="font-semibold">Rp 14.920</p>
+            <p className="font-semibold">{rupiah(unitPrice)}</p>
           </div>
 
           <div>
-            <p className="text-gray-400">Denda (jika terlambat)</p>
-            <p className="font-semibold">Rp 0</p>
+            <p className="text-gray-400">Harga Awal</p>
+            <p className="font-semibold">{rupiah(tax/100)}</p>
           </div>
 
         </div>
@@ -118,7 +250,7 @@ const handlePay = async () => {
         </p>
 
         <p className="text-[18px] font-semibold text-gray-900">
-          Rp 185.000
+          {rupiah(totalPayment/1000)}
         </p>
 
       </div>
@@ -165,82 +297,60 @@ const handlePay = async () => {
     </p>
   </div>
 
+<div className="grid grid-cols-4 text-[11px] text-gray-400 font-semibold border-b pb-2 mb-2">
 
-  {/* Header Table */}
-  <div className="grid grid-cols-4 text-[11px] text-gray-400 font-semibold border-b pb-2 mb-2">
+  <p>PERIODE</p>
+  <p>VOLUME</p>
+  <p>TOTAL TAGIHAN</p>
+  <p>TANGGAL BAYAR</p>
 
-    <p>PERIODE</p>
-    <p>VOLUME</p>
-    <p>TOTAL TAGIHAN</p>
-    <p>TANGGAL BAYAR</p>
+</div>
 
-  </div>
+{historyBills.length === 0 ? (
 
+  <p className="text-[12px] text-gray-400">
+    Belum ada riwayat tagihan
+  </p>
 
-  {/* Row 1 */}
-  <div className="grid grid-cols-4 text-[13px] py-3 border-b">
+) : (
+
+  historyBills.map((bill) => (
+
+  <div
+    key={bill.id}
+    className="grid grid-cols-4 text-[13px] py-3 border-b"
+  >
 
     <p className="text-gray-700">
-      Desember 2025
+      {bill.billingPeriod}
     </p>
 
     <p className="text-gray-500">
-      11.8 m³
+      {bill.waterUsage} m³
     </p>
 
     <p className="font-semibold text-gray-800">
-      Rp 175.000
+      {rupiah(bill.totalAmount)}
     </p>
 
     <p className="text-gray-500">
-      20 Des 2025
+      {
+        new Date(
+          bill.updatedAt
+        ).toLocaleDateString(
+          "id-ID",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+          }
+        )
+      }
     </p>
 
   </div>
 
-
-  {/* Row 2 */}
-  <div className="grid grid-cols-4 text-[13px] py-3 border-b">
-
-    <p className="text-gray-700">
-      November 2025
-    </p>
-
-    <p className="text-gray-500">
-      9.8 m³
-    </p>
-
-    <p className="font-semibold text-gray-800">
-      Rp 148.000
-    </p>
-
-    <p className="text-gray-500">
-      19 Nov 2025
-    </p>
-
-  </div>
-
-
-  {/* Row 3 */}
-  <div className="grid grid-cols-4 text-[13px] py-3">
-
-    <p className="text-gray-700">
-      Oktober 2025
-    </p>
-
-    <p className="text-gray-500">
-      11.5 m³
-    </p>
-
-    <p className="font-semibold text-gray-800">
-      Rp 171.000
-    </p>
-
-    <p className="text-gray-500">
-      22 Okt 2025
-    </p>
-
-  </div>
+)))}
 
 </div>
       </div>

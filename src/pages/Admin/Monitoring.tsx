@@ -1,20 +1,20 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import notifIcon from "../../assets/adminDasbord/Lonceng.svg"
 import Trash from "../../assets/adminMonitor/Trash.svg";
 
 /* ===================== DATA ===================== */
-const allUnits = Array.from({ length: 18 }, (_, i) => ({
-  id: i,
-  unit: `Unit ${101 + i}`,
-  idMeter: "OsBJxsqznl2frgSwNd4",
-  konsumsi: "18.2 m³",
-  email: "christianbryan263@gmail.com",
-  status: i === 1 || i === 4 || i === 5 || i === 9 || i === 13 ? "Belum Dibayar" : "Lunas",
-}))
 
 const STATUS_OPTIONS  = ["Semua Status",     "Lunas", "Belum Dibayar"] as const
 const PAYMENT_OPTIONS = ["Semua Pembayaran", "Lunas", "Belum Dibayar"] as const
 const PER_PAGE = 10
+type UnitType = {
+  id: string
+  unit: string
+  idMeter: string
+  konsumsi: string
+  email: string
+  status: string
+}
 
 export default function Monitoring() {
   const [search,        setSearch]        = useState("")
@@ -23,20 +23,60 @@ export default function Monitoring() {
   const [statusOpen,    setStatusOpen]    = useState(false)
   const [paymentOpen,   setPaymentOpen]   = useState(false)
   const [page,          setPage]          = useState(1)
-  const [menuOpen,      setMenuOpen]      = useState<number | null>(null)
+  const [menuOpen, setMenuOpen] =
+  useState<string | null>(null)
+  const [allUnits, setAllUnits] =
+  useState<UnitType[]>([])
 
 
 
   /* ---- filtered data ---- */
-  const filtered = allUnits.filter(row => {
+  const filtered =
+  allUnits.filter((row) => {
+
     const matchSearch =
-      row.unit.toLowerCase().includes(search.toLowerCase()) ||
-      row.idMeter.toLowerCase().includes(search.toLowerCase()) ||
-      row.email.toLowerCase().includes(search.toLowerCase())
-    const matchStatus  = statusFilter  === "Semua Status"     || row.status === statusFilter
-    const matchPayment = paymentFilter === "Semua Pembayaran" || row.status === paymentFilter
-    return matchSearch && matchStatus && matchPayment
-  })
+
+      row.unit
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        ) ||
+
+      row.idMeter
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        ) ||
+
+      row.email
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+
+    const matchStatus =
+
+      statusFilter ===
+        "Semua Status" ||
+
+      row.status ===
+        statusFilter
+
+    const matchPayment =
+
+      paymentFilter ===
+        "Semua Pembayaran" ||
+
+      row.status ===
+        paymentFilter
+
+    return (
+      matchSearch &&
+      matchStatus &&
+      matchPayment
+    )
+
+})
 
   /* ---- pagination ---- */
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
@@ -52,7 +92,43 @@ export default function Monitoring() {
   const [showDeletePopup, setShowDeletePopup] = useState(false)
   const [showEditPopup, setShowEditPopup] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<any>(null)
+useEffect(() => {
 
+  const fetchUnits =
+    async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token")
+
+      const response =
+        await fetch(
+          "http://localhost:3000/api/v1/admin/monitoring-units",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        )
+
+      const result =
+        await response.json()
+
+      setAllUnits(result)
+
+    } catch (error) {
+
+      console.error(error)
+
+    }
+
+  }
+
+  fetchUnits()
+
+}, [])
   return (
     <div className="space-y-8 max-w-[1400px] mx-auto">
 
