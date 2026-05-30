@@ -28,6 +28,16 @@ export default function Home() {
   const [showLogoutPopup, setShowLogoutPopup] =
   useState(false);
 
+  type Bill = {
+  totalAmount: number;
+  dueDate: string;
+  status: string;
+  billingPeriod: string;
+};
+
+  const [currentBill, setCurrentBill] =
+  useState<Bill | null>(null);
+
   useEffect(() => {
 
     const loadMonthlyVolume =
@@ -73,6 +83,57 @@ export default function Home() {
     };
 
   loadMonthlyVolume();
+
+const loadCurrentBill =
+async () => {
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+      console.log(
+  "TOKEN CURRENT BILL =",
+  localStorage.getItem("token")
+);
+
+      console.log(
+  "TOKEN =",
+  token
+);
+
+    const response =
+      await fetch(
+        "http://localhost:3000/api/v1/dashboard/current-bill",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+    const result =
+      await response.json();
+
+    console.log(
+      "CURRENT BILL:",
+      result
+    );
+
+    setCurrentBill(
+  result.data
+);
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
+
+loadCurrentBill();
 
 const user =
       localStorage.getItem("user");
@@ -120,24 +181,30 @@ const nextMonthDate =
 
   nextMonthDate.setDate(1);
 
-  const dueDateText =
-    nextMonthDate.toLocaleDateString(
-      "id-ID",
-      {
-        day: "numeric",
-        month: "short",
-      }
-    );
+  const formattedBill =
+  currentBill
+    ? new Intl.NumberFormat(
+        "id-ID",
+        {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0
+        }
+      ).format(currentBill.totalAmount)
+    : "Rp 0";
 
-const formattedBill =
-  new Intl.NumberFormat(
-    "id-ID",
-    {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0
-    }
-  ).format(estimatedBill);
+const dueDateText =
+  currentBill?.dueDate
+    ? new Date(currentBill.dueDate)
+        .toLocaleDateString(
+          "id-ID",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+          }
+        )
+    : "-";
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
@@ -202,13 +269,31 @@ const formattedBill =
             <div className="bg-white rounded-[18px] p-4 flex-1 shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
               <div className="flex items-center gap-2 mb-3 h-[30px]">
                 <img src={Belumbayar} className="w-[30px] h-[30px]" />
-                <div className="flex items-center h-[22px] bg-red-50 text-red-500 rounded-[8px] px-[8px]">
-                  <span className="text-[9px] font-semibold whitespace-nowrap">
-                    Belum dibayar
-                  </span>
-                </div>
+                <div
+  className={`
+    flex items-center h-[22px]
+    rounded-[8px] px-[8px]
+    ${
+      currentBill?.status === "OVERDUE"
+        ? "bg-red-50 text-red-500"
+        : currentBill?.status === "UNPAID"
+        ? "bg-orange-50 text-orange-500"
+        : "bg-green-50 text-green-500"
+    }
+  `}
+>
+  <span className="text-[9px] font-semibold whitespace-nowrap">
+    {
+      currentBill?.status === "OVERDUE"
+        ? "Terlambat"
+        : currentBill?.status === "UNPAID"
+        ? "Belum Dibayar"
+        : "Lunas"
+    }
+  </span>
+</div>
               </div>
-              <p className="text-gray-400 text-[10px]">Tagihan Berjalan</p>
+              <p className="text-gray-400 text-[10px]">{"Tagihan " + (currentBill?.billingPeriod)}</p>
               <h2 className="text-[22px] font-bold mt-1 text-gray-900">{formattedBill}</h2>
               <p className="text-[10px] font-semibold text-gray-500 mt-2">Jatuh tempo {dueDateText}</p>
             </div>

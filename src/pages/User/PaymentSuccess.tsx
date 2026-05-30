@@ -44,7 +44,7 @@ export default function PaymentSuccess() {
 
         {/* SUBTITLE */}
         <p className="text-[14px] text-gray-400 text-center leading-relaxed">
-  Tagihan Januari 2026 Anda telah 
+  Tagihan Anda telah 
   <br />
   berhasil dibayarkan.
 </p>

@@ -8,7 +8,74 @@ import Wallet from "../../assets/beranda/Wallet.svg";
 import Unduh from "../../assets/Tagihan/Unduh.svg";
 
 export default function BayarTagihan() {
+const handleDownloadInvoice =
+async () => {
 
+  if (
+    currentBill?.status !== "PAID"
+  ) {
+    return;
+  }
+
+  try {
+
+    const token =
+      localStorage.getItem(
+        "token"
+      );
+
+    const response =
+      await fetch(
+        `http://localhost:3000/api/v1/payment/invoice/${currentBill.id}`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+    const blob =
+      await response.blob();
+
+    const url =
+      window.URL.createObjectURL(
+        blob
+      );
+
+    const a =
+      document.createElement(
+        "a"
+      );
+
+    a.href = url;
+
+    a.download =
+      `invoice-${currentBill.billNumber}.pdf`;
+
+    document.body.appendChild(
+      a
+    );
+
+    a.click();
+
+    a.remove();
+
+    window.URL.revokeObjectURL(
+      url
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Gagal mengunduh invoice"
+    );
+
+  }
+
+};
   const navigate = useNavigate();
   const [monthlyVolume, setMonthlyVolume] =
   useState(0);
@@ -19,6 +86,13 @@ const [unitPrice, setUnitPrice] =
 const [historyBills, setHistoryBills] =
   useState<any[]>([]);
 
+  const [currentBill, setCurrentBill] =
+  useState<any>(null);
+  const isPaidOff =
+  currentBill?.isCompleted;
+  const canDownloadInvoice =
+  currentBill?.status === "PAID";
+
   useEffect(() => {
 
   const loadBillData = async () => {
@@ -27,6 +101,24 @@ const [historyBills, setHistoryBills] =
 
       const token =
         localStorage.getItem("token");
+
+const currentBillResponse =
+  await fetch(
+    "http://localhost:3000/api/v1/dashboard/current-bill",
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`
+      }
+    }
+  );
+
+const currentBillData =
+  await currentBillResponse.json();
+
+setCurrentBill(
+  currentBillData.data
+);
 
       // DASHBOARD
       const dashboardResponse =
@@ -85,12 +177,19 @@ const [historyBills, setHistoryBills] =
 }, []);
 
 const handlePay = async () => {
+
+  if (isPaidOff) {
+    return;
+  }
   try {
+
+    console.log("CURRENT BILL", currentBill);
+console.log("BILL ID", currentBill?.id);
 
    const response = await axios.post(
   "http://localhost:3000/api/v1/payment",
   {
-    billId: "4439b35d-a393-451f-904a-254c331fe4f0",
+    billId: currentBill.id,
   }
 );
     const paymentUrl =
@@ -195,11 +294,11 @@ const currentMonthYear =
 
   <div>
     <h2 className="text-[16px] font-semibold">
-      Tagihan {currentMonthYear}
+      Tagihan {currentBill?.billingPeriod}
     </h2>
 
     <p className="text-[12px] text-gray-400">
-      Periode: 1 – {lastDayOfMonth} {" "} {currentMonthYear}
+      Periode: 1 – {lastDayOfMonth} {" "} {currentBill?.billingPeriod}
     </p>
   </div>
 
@@ -211,32 +310,67 @@ const currentMonthYear =
 
           <div>
             <p className="text-gray-400">Jatuh Tempo</p>
-            <p className="font-semibold">{formattedDueDate}</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : currentBill?.dueDate
+    ? new Date(
+        currentBill.dueDate
+      ).toLocaleDateString(
+        "id-ID",
+        {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        }
+      )
+    : "-"
+}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Biaya Administrasi</p>
-            <p className="font-semibold">Rp 2.500</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : `Rp 2.500`
+}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Pemakaian</p>
-            <p className="font-semibold">{(monthlyVolume / 1000).toFixed(1)} m³</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : `${currentBill?.waterUsage} m³`
+}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Pajak</p>
-            <p className="font-semibold">{rupiah(tax/1000)}</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : rupiah(currentBill?.totalAmount * 0.1)
+}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Harga /m³</p>
-            <p className="font-semibold">{rupiah(unitPrice)}</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : rupiah(currentBill?.unitPrice)
+}</p>
           </div>
 
           <div>
             <p className="text-gray-400">Harga Awal</p>
-            <p className="font-semibold">{rupiah(tax/100)}</p>
+            <p className="font-semibold">{
+  isPaidOff
+    ? "-"
+    : rupiah(currentBill?.totalAmount)
+}</p>
           </div>
 
         </div>
@@ -250,7 +384,11 @@ const currentMonthYear =
         </p>
 
         <p className="text-[18px] font-semibold text-gray-900">
-          {rupiah(totalPayment/1000)}
+          {
+  isPaidOff
+    ? "Lunas"
+    : rupiah(currentBill?.totalAmount + 2500 + (currentBill?.totalAmount * 0.1))
+}
         </p>
 
       </div>
@@ -258,6 +396,7 @@ const currentMonthYear =
         {/* ================= BUTTON BAYAR ================= */}
 <button
   onClick={handlePay}
+  disabled={isPaidOff}
   className="w-full h-[40px] flex items-center justify-center gap-2 text-white text-[14px] font-medium active:scale-[0.97] transition"
   style={{
     borderRadius: "34px",
@@ -269,11 +408,17 @@ const currentMonthYear =
   }}
 >
   <img src={Wallet} className="w-[18px] h-[18px]" />
-  Bayar Tagihan
+  {
+    isPaidOff
+      ? "Sudah Lunas"
+      : "Bayar Tagihan"
+  }
 </button>
 
         {/* ================= BUTTON UNDUH ================= */}
         <button
+        onClick={handleDownloadInvoice}
+        disabled={!canDownloadInvoice}
         className="w-full h-[40px] flex items-center justify-center gap-2 text-gray-700 text-[14px] font-medium mt-3 border border-gray-200 bg-white"
         style={{
           borderRadius: "34px",
