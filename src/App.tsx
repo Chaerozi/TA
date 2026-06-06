@@ -15,12 +15,14 @@ import ActivateAccount from "./components/ActivateAccount"
 import ProtectedRoute from "./components/ProtectRoute";
 import ForgotPassword from "./pages/User/ForgotPassword"
 import ResetPassword from "./pages/User/ResetPassword";
+import Ticketing from "./pages/User/Ticketing";
 
 // ADMIN
 import Dashboard from "./pages/Admin/Dashbord"
 import AdminLayout from "./layouts/AdminLayout"
 import Monitoring from "./pages/Admin/Monitoring"
 import Billing from "./pages/Admin/Billing"
+import Pesan from "./pages/Admin/Pesan"
 
 export default function App() {
   return (
@@ -59,12 +61,13 @@ export default function App() {
   path="/payment-success"
   element={<PaymentSuccess />}
 />
+<Route path="/ticketing" element={<Ticketing />} />
       {/* ADMIN */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="monitoring" element={<Monitoring />} />
         <Route path="billing" element={<Billing />} />
-
+        <Route path="pesan" element={<Pesan />} />
       </Route>
 
     </Routes>

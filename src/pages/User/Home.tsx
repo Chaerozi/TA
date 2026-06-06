@@ -11,6 +11,7 @@ import Line from "../../assets/beranda/Line.svg";
 import Persen from "../../assets/beranda/persen.svg";
 import LogoutIcon from "../../assets/beranda/Logout.svg";
 import IconLogout from "../../assets/beranda/IconLogout.svg";
+import LaporIcon from "../../assets/beranda/lapor.svg";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -415,6 +416,44 @@ const dueDateText =
           </div>
         </div>
         
+{/* LAPOR MASALAH */}
+<div className="mt-4 px-4">
+  
+  <p className="text-[12px] font-normal text-[#98A2B3]">
+    Terjadi masalah?
+  </p>
+
+<button
+  onClick={() => navigate("/ticketing")}
+  className="
+    mt-2 flex items-center justify-center gap-1.5
+    w-[119px] h-[26px]
+    rounded-[118px]
+    border border-[#D0D5DD]
+    bg-white
+    active:scale-[0.98]
+  "
+>
+    <img
+      src={LaporIcon}
+      alt="Lapor"
+      className="w-[14px] h-[14px]"
+    />
+
+    <span
+      className="
+        text-[14px]
+        font-medium
+        text-[#2563FF]
+        leading-none
+      "
+    >
+      Lapor disini
+    </span>
+  </button>
+
+</div>
+
 {/* POPUP LOGOUT */}
 {showLogoutPopup && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4">
