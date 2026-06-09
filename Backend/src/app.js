@@ -17,6 +17,7 @@ import billingRoutes from './routes/billing.js';
 import paymentRoutes from './routes/payment.js';
 import userRoutes from './routes/users.js';
 import adminRoutes from "./routes/admin.js";
+import ticketRoutes from "./routes/ticket.js";
 
 
 dotenv.config();
@@ -60,8 +61,7 @@ app.use('/api/v1/iot', iotRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/billing', billingRoutes);
 app.use('/api/v1/admin', adminRoutes);
-
-
+app.use('/api/v1/tickets', ticketRoutes);
 app.use(errorHandler);
 
 export default app;

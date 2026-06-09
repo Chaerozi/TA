@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import notifIcon from "../../assets/adminDasbord/Lonceng.svg";
 import Mata from "../../assets/Pesan/Mata.svg";
@@ -10,45 +11,21 @@ type PaymentType = "Semua Pembayaran" | "Sudah Bayar" | "Belum Bayar";
 
 interface Ticket {
   id: string;
-  unit: string;
-  kategori: string;
-  status: "Aktif" | "Selesai";
-  tanggal: string;
-  deskripsi: string;
-  foto?: string;
-}
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
-const tickets: Ticket[] = [
-  {
-    id: "TK-0001", unit: "Unit 101", kategori: "Kebocoran", status: "Aktif",
-    tanggal: "15 Apr 2026",
-    deskripsi: "Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.",
-    foto: "https://placehold.co/400x220/e8f0fe/2563eb?text=Foto+Keluhan",
-  },
-  {
-    id: "TK-0002", unit: "Unit 101", kategori: "Kebocoran", status: "Selesai",
-    tanggal: "15 Apr 2026",
-    deskripsi: "Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.",
-    foto: "https://placehold.co/400x220/e8f0fe/2563eb?text=Foto+Keluhan",
-  },
-  {
-    id: "TK-0003", unit: "Unit 101", kategori: "Kebocoran", status: "Aktif",
-    tanggal: "15 Apr 2026",
-    deskripsi: "Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.",
-  },
-  {
-    id: "TK-0004", unit: "Unit 101", kategori: "Kebocoran", status: "Aktif",
-    tanggal: "15 Apr 2026",
-    deskripsi: "Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.",
-    foto: "https://placehold.co/400x220/e8f0fe/2563eb?text=Foto+Keluhan",
-  },
-  {
-    id: "TK-0005", unit: "Unit 101", kategori: "Kebocoran", status: "Aktif",
-    tanggal: "15 Apr 2026",
-    deskripsi: "Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.",
-  },
-];
+  ticketNumber: string;
+
+  address: string;
+
+  category: string;
+
+  complaint: string;
+
+  imageUrl: string | null;
+
+  status: "Aktif" | "Selesai";
+
+  createdAt: string;
+}
 
 const STATUS_OPTIONS:  StatusType[]  = ["Semua Status", "Aktif", "Selesai"];
 const PAYMENT_OPTIONS: PaymentType[] = ["Semua Pembayaran", "Sudah Bayar", "Belum Bayar"];
@@ -180,14 +157,17 @@ function TicketModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Ticket ID</p>
-                <p className="text-[13px] text-[#667085]">{ticket.id}</p>
+                <p className="text-[13px] text-[#667085]">{ticket.ticketNumber
+  .split("-")
+  .slice(0, 2)
+  .join("-")}</p>
               </div>
               <div>
                 <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Status</p>
                 <p className={`text-[13px] font-semibold ${
                   ticket.status === "Aktif" ? "text-[#0022FF]" : "text-[#34C759]"
                 }`}>
-                  {ticket.status === "Aktif" ? "Open" : "Selesai"}
+                  {ticket.status === "Aktif" ? "Aktif" : "Selesai"}
                 </p>
               </div>
             </div>
@@ -196,28 +176,36 @@ function TicketModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Unit</p>
-                <p className="text-[13px] text-[#667085]">{ticket.unit}</p>
+                <p className="text-[13px] text-[#667085]">{ticket.address}</p>
               </div>
               <div>
                 <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Deskripsi Keluhan</p>
-                <p className="text-[13px] text-[#667085] leading-[18px]">{ticket.deskripsi}</p>
+                <p className="text-[13px] text-[#667085] leading-[18px]">{ticket.complaint}</p>
               </div>
             </div>
 
             {/* Kategori */}
             <div>
               <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Kategori</p>
-              <p className="text-[13px] text-[#667085]">{ticket.kategori}</p>
+              <p className="text-[13px] text-[#667085]">{ticket.category}</p>
             </div>
 
             {/* Tanggal */}
             <div>
               <p className="text-[12px] font-semibold text-[#101828] mb-[3px]">Tanggal Lapor</p>
-              <p className="text-[13px] text-[#667085]">{ticket.tanggal}</p>
+              <p className="text-[13px] text-[#667085]">{new Date(ticket.createdAt)
+  .toLocaleDateString(
+    "id-ID",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  )}</p>
             </div>
 
             {/* Foto Keluhan */}
-            {ticket.foto && (
+            {ticket.imageUrl && (
               <div>
                 <p className="text-[12px] font-semibold text-[#101828] mb-[6px]">Foto Keluhan</p>
                 <div
@@ -225,7 +213,7 @@ function TicketModal({
                   onClick={() => setImgOpen(true)}
                 >
                   <img
-                    src={ticket.foto}
+                    src={ticket.imageUrl || undefined}
                     alt="Foto Keluhan"
                     className="w-full h-[140px] object-cover group-hover:opacity-90 transition"
                   />
@@ -268,14 +256,14 @@ function TicketModal({
       </div>
 
       {/* Lightbox full-screen image */}
-      {imgOpen && ticket.foto && (
+      {imgOpen && ticket.imageUrl && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 px-4"
           onClick={() => setImgOpen(false)}
         >
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <img
-              src={ticket.foto}
+              src={ticket.imageUrl || undefined}
               alt="Foto Keluhan"
               className="rounded-[12px] max-w-[90vw] max-h-[80vh] object-contain shadow-2xl"
             />
@@ -305,25 +293,95 @@ export default function Pesan() {
   const [paymentOpen,     setPaymentOpen]     = useState(false);
   const [selectedTicket,  setSelectedTicket]  = useState<Ticket | null>(null);
   const [showSuccess,     setShowSuccess]     = useState(false);
-  const [ticketData,      setTicketData]      = useState<Ticket[]>(tickets);
+  const [ticketData, setTicketData] =
+  useState<Ticket[]>([]);
+  const loadTickets = async () => {
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+    const response =
+      await axios.get(
+        "http://localhost:3000/api/v1/admin/tickets",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+    setTicketData(
+      response.data.data
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
+useEffect(() => {
+
+  loadTickets();
+
+}, []);
 
   const filteredTickets = ticketData.filter((item) => {
     const q = search.toLowerCase();
     const matchSearch =
-      item.id.toLowerCase().includes(q) ||
-      item.unit.toLowerCase().includes(q) ||
-      item.kategori.toLowerCase().includes(q);
+  item.id.toLowerCase().includes(q) ||
+  item.address.toLowerCase().includes(q) ||
+  item.category.toLowerCase().includes(q);
     const matchStatus =
       statusFilter === "Semua Status" || item.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
-  const handleTandaiSelesai = (id: string) => {
-    setTicketData((prev) =>
-      prev.map((t) => t.id === id ? { ...t, status: "Selesai" as const } : t)
-    );
-    setSelectedTicket(null); // tutup modal detail
-    setShowSuccess(true);    // tampilkan popup sukses
+  const handleTandaiSelesai =
+  async (id: string) => {
+
+    try {
+
+      const token =
+        localStorage.getItem(
+          "token"
+        );
+
+      await axios.patch(
+        `http://localhost:3000/api/v1/admin/tickets/${id}/status`,
+        {},
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+      setSelectedTicket(
+        null
+      );
+
+      setShowSuccess(
+        true
+      );
+
+      await loadTickets();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Gagal memperbarui status"
+      );
+
+    }
+
   };
 
   const closeAll = () => {
@@ -428,11 +486,14 @@ export default function Pesan() {
                 className="text-center text-[13px] font-semibold text-[#101828] cursor-pointer hover:text-[#0022FF] transition-colors"
                 onClick={() => setSelectedTicket(ticket)}
               >
-                {ticket.id}
+                {ticket.ticketNumber
+  .split("-")
+  .slice(0, 2)
+  .join("-")}
               </p>
 
-              <p className="text-center text-[13px] font-medium text-[#101828]">{ticket.unit}</p>
-              <p className="text-center text-[13px] font-medium text-[#344054]">{ticket.kategori}</p>
+              <p className="text-center text-[13px] font-medium text-[#101828]">{ticket.address}</p>
+              <p className="text-center text-[13px] font-medium text-[#344054]">{ticket.category}</p>
 
               <p className={`text-center text-[13px] font-semibold ${
                 ticket.status === "Aktif" ? "text-[#0022FF]" : "text-[#34C759]"
@@ -440,7 +501,15 @@ export default function Pesan() {
                 {ticket.status}
               </p>
 
-              <p className="text-center text-[13px] font-medium text-[#667085]">{ticket.tanggal}</p>
+              <p className="text-center text-[13px] font-medium text-[#667085]">{new Date(ticket.createdAt)
+  .toLocaleDateString(
+    "id-ID",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }
+  )}</p>
             </div>
           ))
         )}

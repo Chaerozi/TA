@@ -1,5 +1,6 @@
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Panah from "../../assets/Tagihan/Panah.svg";
 import Berhasil from "../../assets/adminDasbord/Berhasil.svg";
@@ -11,6 +12,129 @@ export default function Ticketing() {
   const [activeTab, setActiveTab] = useState<"buat" | "daftar">("buat");
   const [kategori, setKategori] = useState("");
   const [keluhan, setKeluhan] = useState("");
+  const [tickets, setTickets] =
+  useState<any[]>([]);
+  const handleCreateTicket =
+  async () => {
+
+    try {
+
+      if (!kategori) {
+        alert(
+          "Pilih kategori terlebih dahulu"
+        );
+        return;
+      }
+
+      if (!keluhan) {
+        alert(
+          "Isi keluhan terlebih dahulu"
+        );
+        return;
+      }
+
+      const token =
+        localStorage.getItem(
+          "token"
+        );
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "category",
+        kategori
+      );
+
+      formData.append(
+        "complaint",
+        keluhan
+      );
+
+      if (image) {
+
+        formData.append(
+          "image",
+          image
+        );
+
+      }
+
+      const response =
+        await axios.post(
+          "http://localhost:3000/api/v1/tickets",
+          formData,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      console.log(
+        response.data
+      );
+
+      setShowSuccessPopup(
+        true
+      );
+      await loadTickets();
+
+      setKategori("");
+      setKeluhan("");
+      setImage(null);
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      alert(
+        "Gagal membuat ticket"
+      );
+
+    }
+
+  };
+  const [image, setImage] = useState<File | null>(null);
+const loadTickets =
+  async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem(
+          "token"
+        );
+
+      const response =
+        await axios.get(
+          "http://localhost:3000/api/v1/tickets/my",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      setTickets(
+        response.data.data
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+  useEffect(() => {
+    loadTickets();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -111,7 +235,22 @@ export default function Ticketing() {
                 Upload Foto (opsional)
               </label>
 
-              <input type="file" id="upload" className="hidden" />
+              <input
+  type="file"
+  id="upload"
+  className="hidden"
+  accept="image/*"
+  onChange={(e) => {
+
+    const file =
+      e.target.files?.[0];
+
+    if (file) {
+      setImage(file);
+    }
+
+  }}
+/>
 
               <label
                 htmlFor="upload"
@@ -125,45 +264,91 @@ export default function Ticketing() {
 
         {/* DAFTAR TICKET */}
         {activeTab === "daftar" && (
-          <div className="mt-4 border border-[#D0D5DD] rounded-[6px] overflow-hidden">
+          <div
+  className="
+    mt-4
+    border
+    border-[#D0D5DD]
+    rounded-[6px]
+    overflow-hidden
+  "
+>
 
-            {/* Ticket 1 - Open */}
-            <div className="p-3 border-b border-dashed border-[#D0D5DD]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-[12px] text-[#98A2B3]">TK-0001</span>
-                  <span className="text-[12px] font-semibold text-[#1B2340]">Unit 101</span>
-                </div>
-                <span className="text-[12px] font-medium text-[#2563FF]">Open</span>
-              </div>
+  {
+    tickets.map(
+      (ticket, index) => (
 
-              <div className="mt-2 flex items-end justify-between gap-3">
-                <p className="text-[12px] leading-[16px] text-[#667085]">
-                  Kebocoran Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.
-                </p>
-                <span className="text-[10px] text-[#98A2B3] shrink-0">15 Apr 2026</span>
-              </div>
+        <div
+          key={ticket.id}
+          className={`
+            p-3
+            ${
+              index !== tickets.length - 1
+              ? "border-b border-dashed border-[#D0D5DD]"
+              : ""
+            }
+          `}
+        >
+
+          <div className="flex items-center justify-between">
+
+            <div className="flex items-center gap-3">
+
+              <span className="text-[12px] text-[#98A2B3]">
+                {ticket.ticketNumber
+  .split("-")
+  .slice(0, 2)
+  .join("-")}
+              </span>
+
+              <span className="text-[12px] font-semibold text-[#1B2340]">
+                {ticket.address}
+              </span>
+
             </div>
 
-            {/* Ticket 2 - Solved */}
-            <div className="p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-[12px] text-[#98A2B3]">TK-0002</span>
-                  <span className="text-[12px] font-semibold text-[#1B2340]">Unit 101</span>
-                </div>
-                <span className="text-[12px] font-medium text-[#34C759]">Solved</span>
-              </div>
-
-              <div className="mt-2 flex items-end justify-between gap-3">
-                <p className="text-[12px] leading-[16px] text-[#667085]">
-                  Kebocoran Penggunaan air meningkat secara tiba-tiba meskipun pemakaian normal.
-                </p>
-                <span className="text-[10px] text-[#98A2B3] shrink-0">15 Apr 2026</span>
-              </div>
-            </div>
+            <span
+              className={`text-[12px] font-medium ${
+                ticket.status === "Aktif"
+                  ? "text-[#2563FF]"
+                  : "text-[#34C759]"
+              }`}
+            >
+              {ticket.status}
+            </span>
 
           </div>
+
+          <div className="mt-2 flex items-end justify-between gap-3">
+
+            <p className="text-[12px] leading-[16px] text-[#667085]">
+              {ticket.category}
+            </p>
+
+            <span className="text-[10px] text-[#98A2B3] shrink-0">
+
+              {new Date(
+                ticket.createdAt
+              ).toLocaleDateString(
+                "id-ID",
+                {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                }
+              )}
+
+            </span>
+
+          </div>
+
+        </div>
+
+      )
+    )
+  }
+
+</div>
         )}
 
       </div>
@@ -172,7 +357,7 @@ export default function Ticketing() {
       {activeTab === "buat" && (
         <div className="px-5 pb-8">
           <button
-            onClick={() => setShowSuccessPopup(true)}
+            onClick={handleCreateTicket}
             className="w-full h-[40px] rounded-[34px] flex items-center justify-center text-white text-[14px] font-medium active:scale-[0.98]"
             style={{
               background:

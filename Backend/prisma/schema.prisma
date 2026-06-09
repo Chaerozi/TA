@@ -32,6 +32,7 @@ model User {
   devices         Device[]
   bills           Bill[]
   waterUsages WaterUsage[]
+  tickets Ticket[]
 
   @@map("users")
 }
@@ -160,4 +161,25 @@ model UnitPrice {
   createdAt DateTime @default(now())
 
   @@map("unit_price")
+}
+
+model Ticket {
+  id            String   @id @default(cuid())
+
+  ticketNumber  String   @unique
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  category      String
+  complaint     String
+
+  imageUrl      String?
+
+  status        String   @default("Aktif")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("tickets")
 }

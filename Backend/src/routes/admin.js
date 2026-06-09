@@ -2,6 +2,7 @@ import express from "express";
 
 import { AdminController }
 from "../controllers/AdminController.js";
+import { TicketController } from "../controllers/TicketController.js";
 
 const router = express.Router();
 
@@ -38,5 +39,15 @@ router.get(
 router.post(
   "/unit-price",
   AdminController.updateUnitPrice
+);
+
+router.get(
+  "/tickets",
+  TicketController.getAllTickets
+);
+
+router.patch(
+  "/tickets/:id/status",
+  TicketController.completeTicket
 );
 export default router;
