@@ -2,7 +2,7 @@ import Water from "../../assets/Login/Water.svg"
 
 import Call from "../../assets/Landing/Cal.svg"
 import Sms from "../../assets/Landing/Sms.svg"
-import Copyright from "../../assets/Landing/Copyright.svg"
+import Copyright from "../../assets/Landing/copyright.svg"
 
 export default function Footer() {
   return (
