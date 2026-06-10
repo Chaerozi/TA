@@ -28,11 +28,11 @@ export default function App() {
   return (
     <Routes>
 
-      <Route path="/landing" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} />
 
       {/* USER */}
     <Route path="/register" element={<Register />} />
-     <Route path="/" element={<Login />} />
+     <Route path="/login" element={<Login />} />
 <Route
   path="/activate-account"
   element={<ActivateAccount />}
