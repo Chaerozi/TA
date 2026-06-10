@@ -6,6 +6,7 @@ import Panah from "../../assets/Tagihan/Panah.svg";
 import BelumBayar from "../../assets/beranda/Blumbayar.svg";
 import Wallet from "../../assets/beranda/Wallet.svg";
 import Unduh from "../../assets/Tagihan/Unduh.svg";
+import Berhasil from "../../assets/adminDasbord/Berhasil.svg";
 
 export default function BayarTagihan() {
 const handleDownloadInvoice =
@@ -261,6 +262,10 @@ const currentMonthYear =
     now.getMonth() + 1,
     0
   ).getDate();
+
+  const [showDownloadPopup, setShowDownloadPopup] = useState(false)
+
+
   return (
     <div className="min-h-screen bg-[#E5E7EB] font-geist flex justify-center">
       <div className="w-full max-w-[430px] min-h-screen bg-[#F3F4F6] shadow-sm relative px-4 pt-10 pb-10">
@@ -415,18 +420,47 @@ const currentMonthYear =
   }
 </button>
 
-        {/* ================= BUTTON UNDUH ================= */}
-        <button
-        onClick={handleDownloadInvoice}
-        disabled={!canDownloadInvoice}
-        className="w-full h-[40px] flex items-center justify-center gap-2 text-gray-700 text-[14px] font-medium mt-3 border border-gray-200 bg-white"
+<button
+  onClick={async () => {
+    await handleDownloadInvoice();
+    setShowDownloadPopup(true);
+  }}
+  disabled={!canDownloadInvoice}
+  className="w-full h-[40px] flex items-center justify-center gap-2 text-gray-700 text-[14px] font-medium mt-3 border border-gray-200 bg-white"
+  style={{ borderRadius: "34px" }}
+>
+  <img src={Unduh} className="w-[18px] h-[18px]" />
+  Unduh Invoice
+</button>
+
+{showDownloadPopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-6">
+    <div className="w-[272px] rounded-[16px] bg-white px-6 pt-7 pb-6 shadow-xl">
+      <div className="flex justify-center">
+        <img src={Berhasil} alt="Berhasil" className="w-[72px] h-[72px]" />
+      </div>
+
+      <h2 className="mt-5 text-center text-[18px] font-bold text-[#1B2340]">
+        Tagihan Berhasil Diunduh
+      </h2>
+
+      <p className="mt-2 text-center text-[14px] leading-[22px] text-[#8B93A7]">
+        Detail tagihan telah berhasil kamu unduh silahkan cek kembali
+      </p>
+
+      <button
+        onClick={() => setShowDownloadPopup(false)}
+        className="mt-6 h-[40px] w-full rounded-[34px] text-[14px] font-medium text-white"
         style={{
-          borderRadius: "34px",
+          background:
+            "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%)",
         }}
       >
-        <img src={Unduh} className="w-[18px] h-[18px]" />
-        Unduh Invoice
+        Kembali
       </button>
+    </div>
+  </div>
+)}
       </div>
 {/* ================= RIWAYAT TAGIHAN ================= */}
 <div className="mt-6 bg-white rounded-[18px] p-5 shadow-sm">
