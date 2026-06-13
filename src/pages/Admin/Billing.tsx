@@ -232,37 +232,10 @@ fetchBillingTable()
           <h1 className="text-[32px] leading-[33px] font-medium text-[#344054] tracking-[-0.03em] mt-[2px]">
             Riwayat Billings
           </h1>
-        </div>
-
-        <div className="w-[302px] h-[68px] rounded-full border border-[#EAECF0] bg-white px-[14px] flex items-center justify-between shadow-[0_1px_2px_rgba(16,24,40,0.05)] shrink-0">
-          <div className="flex items-center gap-[14px]">
-            <div className="w-[52px] h-[52px] rounded-full bg-[#F2F4F7] flex items-center justify-center">
-              <img
-                src={notifIcon}
-                className="w-[24px] h-[24px] opacity-60"
-                alt="notification"
-              />
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="text-[20px] leading-[22px] font-medium text-[#344054]">
-                Hi, Admin
-              </p>
-              <p className="mt-[6px] text-[14px] leading-[22px] font-normal text-[#98A2B3]">
-                Welcome to Aquora
-              </p>
-            </div>
-          </div>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            className="w-[18px] h-[18px] text-[#98A2B3]"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </div>
       </div>
+      </div>      
+
+        
 
       {/* ── STAT CARDS ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

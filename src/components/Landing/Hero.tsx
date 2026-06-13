@@ -4,7 +4,12 @@ import Telkom from "../../assets/Landing/Telkom.svg"
 import Brin from "../../assets/Landing/Brin.svg"
 import Rekayasa from "../../assets/Landing/Rekayasa.svg"
 
+import { useNavigate } from "react-router-dom"
+
 export default function Hero() {
+
+  const navigate = useNavigate()
+
   return (
     <section
       id="home"
@@ -167,6 +172,7 @@ export default function Hero() {
           <div className="mt-8 flex justify-center">
 
             <button
+              onClick={()=>navigate("/login")}
               className="
                 w-[158px]
                 h-[45px]

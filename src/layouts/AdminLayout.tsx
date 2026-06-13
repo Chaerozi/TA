@@ -10,9 +10,8 @@ import leftIcon       from "../assets/adminDasbord/Left.svg"
 import blackHome      from "../assets/AdminBilling/BlackHom.svg"
 import blackUnit      from "../assets/AdminBilling/BlackUnit.svg"
 import blackBill      from "../assets/AdminBilling/BlackBil.svg"
-import IconLogout     from "../assets/adminDasbord/Left.svg"
 import BlackChat      from "../assets/Pesan/LogBlck.svg"
-import Berhasil       from "../assets/adminDasbord/Berhasil.svg"
+import Berhasil       from "../assets/beranda/IconLogout.svg"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

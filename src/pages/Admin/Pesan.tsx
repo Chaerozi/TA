@@ -7,7 +7,7 @@ import Berhasil from "../../assets/adminDasbord/Berhasil.svg";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type StatusType  = "Semua Status"     | "Aktif"       | "Selesai";
-type PaymentType = "Semua Pembayaran" | "Sudah Bayar" | "Belum Bayar";
+
 
 interface Ticket {
   id: string;
@@ -28,7 +28,7 @@ interface Ticket {
 }
 
 const STATUS_OPTIONS:  StatusType[]  = ["Semua Status", "Aktif", "Selesai"];
-const PAYMENT_OPTIONS: PaymentType[] = ["Semua Pembayaran", "Sudah Bayar", "Belum Bayar"];
+
 
 // ─── PillDropdown ─────────────────────────────────────────────────────────────
 function PillDropdown<T extends string>({
@@ -288,7 +288,7 @@ function TicketModal({
 export default function Pesan() {
   const [search,          setSearch]          = useState("");
   const [statusFilter,    setStatusFilter]    = useState<StatusType>("Semua Status");
-  const [paymentFilter,   setPaymentFilter]   = useState<PaymentType>("Semua Pembayaran");
+
   const [statusOpen,      setStatusOpen]      = useState(false);
   const [paymentOpen,     setPaymentOpen]     = useState(false);
   const [selectedTicket,  setSelectedTicket]  = useState<Ticket | null>(null);
@@ -398,22 +398,9 @@ useEffect(() => {
           <p className="text-[15px] font-normal text-[#98A2B3] tracking-[-0.01em]">Smart Water Meter</p>
           <h1 className="text-[28px] font-semibold text-[#344054] tracking-[-0.03em] mt-[2px]">Daftar Ticketing</h1>
         </div>
-
-        <div className="h-[56px] rounded-full border border-[#EAECF0] bg-white px-4 flex items-center gap-3 shadow-[0_1px_2px_rgba(16,24,40,0.05)] shrink-0">
-          <div className="w-[40px] h-[40px] rounded-full bg-[#F2F4F7] flex items-center justify-center">
-            <img src={notifIcon} className="w-[20px] h-[20px] opacity-60" alt="notification" />
-          </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-[15px] leading-[20px] font-semibold text-[#344054]">Hi, Admin</p>
-            <p className="text-[12px] leading-[18px] font-normal text-[#98A2B3]">Welcome to Aquora</p>
-          </div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-            className="w-[14px] h-[14px] text-[#98A2B3] ml-1"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </div>
       </div>
+
+     
 
       {/* ── FILTER BAR ── */}
       <div className="flex items-center justify-between gap-4" onClick={(e) => e.stopPropagation()}>
@@ -439,11 +426,7 @@ useEffect(() => {
             onToggle={() => { setStatusOpen(!statusOpen); setPaymentOpen(false); }}
             onSelect={(v) => { setStatusFilter(v); setStatusOpen(false); }}
           />
-          <PillDropdown
-            value={paymentFilter} options={PAYMENT_OPTIONS} open={paymentOpen} width="195px"
-            onToggle={() => { setPaymentOpen(!paymentOpen); setStatusOpen(false); }}
-            onSelect={(v) => { setPaymentFilter(v); setPaymentOpen(false); }}
-          />
+       
         </div>
       </div>
 
