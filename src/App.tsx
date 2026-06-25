@@ -18,6 +18,7 @@ import ResetPassword from "./pages/User/ResetPassword";
 import Ticketing from "./pages/User/Ticketing";
 
 // ADMIN
+import LoginAdmin from "./pages/Admin/LoginAdmin";
 import Dashboard from "./pages/Admin/Dashbord"
 import AdminLayout from "./layouts/AdminLayout"
 import Monitoring from "./pages/Admin/Monitoring"
@@ -63,6 +64,7 @@ export default function App() {
 />
 <Route path="/ticketing" element={<Ticketing />} />
       {/* ADMIN */}
+      <Route path="/admin-login" element={<LoginAdmin />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="monitoring" element={<Monitoring />} />

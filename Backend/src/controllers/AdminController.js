@@ -321,37 +321,43 @@ static async getPaymentHistory(req, res) {
 
   try {
 
-    const bills =
-  await prisma.bill.findMany({
-  });
+  const bills = await prisma.bill.findMany({
+  orderBy: {
+    updatedAt: "desc",
+  },
+});
 
-    const result =
-  bills.map((bill) => ({
+const result = bills.map((bill) => ({
+  id: bill.userId,
 
-    id: bill.userId,
+  tanggal: new Date(bill.updatedAt).toLocaleString(
+    "id-ID",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZone: "Asia/Jakarta",
+    }
+  ),
 
-    pemakaian:
-      `${bill.waterUsage} m³`,
+  pemakaian: `${bill.waterUsage} m³`,
 
-    status:
-      bill.status
-        ?.trim()
-        .toUpperCase() === "PAID"
-          ? "Lunas"
-          : "Belum Dibayar",
+  status:
+    bill.status?.trim().toUpperCase() === "PAID"
+      ? "Lunas"
+      : "Belum Dibayar",
 
-    tagihan:
-      new Intl.NumberFormat(
-        "id-ID",
-        {
-          style: "currency",
-          currency: "IDR",
-          maximumFractionDigits: 0
-        }
-      ).format(
-        bill.totalAmount
-      )
-
+  tagihan: new Intl.NumberFormat(
+    "id-ID",
+    {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }
+  ).format(bill.totalAmount),
 }));
 
     return res.json(result);
@@ -609,6 +615,59 @@ const collectionPercentage =
     });
 
   }
+}
+
+  static async deleteMonitoringUnit(req, res) {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Unit tidak ditemukan",
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.waterUsage.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+
+      await tx.bill.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+
+      await tx.device.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+
+      await tx.user.delete({
+        where: {
+          id,
+        },
+      });
+    });
+
+    return res.json({
+      message: "Unit berhasil dihapus",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Failed to delete monitoring unit",
+    });
+  }
+
 
 }
 

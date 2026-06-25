@@ -9,9 +9,9 @@ import Wallet from "../../assets/beranda/Wallet.svg";
 import Graph from "../../assets/beranda/Graph.svg";
 import Line from "../../assets/beranda/Line.svg";
 import Persen from "../../assets/beranda/persen.svg";
-import LogoutIcon from "../../assets/beranda/Logout.svg";
-import IconLogout from "../../assets/beranda/IconLogout.svg";
+import IconLogout from "../../assets/new/logout-circle-line.svg";
 import LaporIcon from "../../assets/beranda/lapor.svg";
+import Hamburger from "../../assets/new/burger.svg";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -19,6 +19,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"Harian" | "Mingguan" | "Bulanan">("Harian");
   const [chartData, setChartData] = useState([]);
   const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [customerNumber, setCustomerNumber] = useState("");
+const [userAddress, setUserAddress] = useState("");
   const [monthlyVolume, setMonthlyVolume] =
   useState(0);
   const [monthlyDifference, setMonthlyDifference] =
@@ -28,6 +31,7 @@ export default function Home() {
   
   const [showLogoutPopup, setShowLogoutPopup] =
   useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   type Bill = {
   totalAmount: number;
@@ -51,7 +55,7 @@ export default function Home() {
 
         const response =
           await fetch(
-            "http://localhost:3000/api/v1/dashboard/monthly-volume",
+             `${API_URL}/api/v1/dashboard/monthly-volume`,
             {
               headers: {
                 Authorization:
@@ -105,7 +109,7 @@ async () => {
 
     const response =
       await fetch(
-        "http://localhost:3000/api/v1/dashboard/current-bill",
+        `${API_URL}/api/v1/dashboard/current-bill`,
         {
           headers: {
             Authorization:
@@ -136,25 +140,22 @@ async () => {
 
 loadCurrentBill();
 
-const user =
-      localStorage.getItem("user");
+const user = localStorage.getItem("user");
 
-    if (user) {
+if (user) {
+  const parsedUser = JSON.parse(user);
 
-      const parsedUser =
-        JSON.parse(user);
-
-      setUserName(
-        parsedUser.name
-      );
-
-    }
+  setUserName(parsedUser.name || "");
+  setUserEmail(parsedUser.email || "");
+  setCustomerNumber(parsedUser.customer_number || "");
+  setUserAddress(parsedUser.address || "");
+}
 
     const loadChart = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:3000/api/v1/dashboard/chart?range=${activeTab}`,
+          `${API_URL}/api/v1/dashboard/chart?range=${activeTab}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -224,18 +225,18 @@ const dueDateText =
               {userName}
             </h1>
 
-            <button
+      <button
   onClick={() => setShowLogoutPopup(true)}
-              className="
-                absolute top-6 right-5
-                w-[46px] h-[46px]
-                rounded-[12px] bg-[#2D7DFF]
-                flex items-center justify-center
-                shadow-md active:scale-[0.96] transition-all
-              "
-            >
-              <img src={LogoutIcon} alt="Logout" className="w-[22px] h-[22px]" />
-            </button>
+  className="
+    absolute top-6 right-5
+    w-[46px] h-[46px]
+    rounded-[12px] bg-[#2D7DFF]
+    flex items-center justify-center
+    shadow-md active:scale-[0.96] transition-all
+  "
+>
+  <img src={Hamburger} alt="Menu" className="w-[22px] h-[22px]" />
+</button>
           </div>
 
           {/* ===== CARDS ===== */}
@@ -454,97 +455,75 @@ const dueDateText =
 
 </div>
 
-{/* POPUP LOGOUT */}
+{/* PROFILE DRAWER */}
 {showLogoutPopup && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4">
+  <div className="fixed inset-0 z-50 flex justify-center bg-black/25">
+    <div className="relative w-full max-w-[438px] h-screen overflow-hidden">
+      
+      {/* OVERLAY AREA KIRI */}
+     <div
+  onClick={() => setShowLogoutPopup(false)}
+  className="absolute inset-0 bg-black/40"
+/>
+      {/* DRAWER */}
+      <div
+        className="
+          absolute top-0 right-0
+          h-full w-[260px]
+          bg-white
+          px-7 pt-12
+          shadow-xl
+        "
+      >
+  <h2 className="text-[20px] font-bold text-[#111827]">
+  {userName}
+</h2>
 
-    <div
-      className="
-        w-[272px]
-        h-[325.16px]
-        rounded-[12px]
-        bg-white
-        shadow-xl
-        px-6
-        pt-7
-      "
-    >
+<p className="mt-2 text-[12px] text-[#8B93A7]">
+  {userEmail}
+</p>
 
-      {/* ICON */}
-      <div className="flex justify-center">
-        <img
-          src={IconLogout}
-          alt="Logout"
-          className="w-[65.41px] h-[65.41px] object-contain"
-        />
-      </div>
+<p className="mt-2 text-[12px] text-[#8B93A7]">
+  ID Meter {customerNumber}
+</p>
 
-      {/* TITLE */}
-      <h2 className="mt-4 text-center text-[16px] font-bold text-[#1B2340]">
-        Keluar dari Akun?
-      </h2>
+<p className="mt-2 text-[12px] text-[#8B93A7]">
+  {userAddress}
+</p>
 
-      {/* DESC */}
-      <p className="mt-4 text-center text-[12px] leading-[14px] text-[#8B93A7]">
-        Anda akan keluar dari sesi saat ini dan
-        perlu masuk kembali untuk mengakses
-        akun Anda.
-      </p>
-
-    {/* BUTTON KELUAR */}
-<button
+        {/* BUTTON KELUAR */}
+  <button
   onClick={() => {
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/login");
-
   }}
   className="
-    mt-6
-    w-[220.19px]
-    h-[36.72px]
-    rounded-[34px]
-    mx-auto
-    block
-    text-white
-    text-[14px]
-    font-medium
-    transition-all
-    active:scale-[0.98]
-  "
-  style={{
-    background:
-      "radial-gradient(108.89% 108.89% at 50% 48.61%, #3FACFF 0%, #0034FF 100%), linear-gradient(180deg, #3FACFF -2.78%, #0034FF 100%), #2173FF",
-    boxShadow:
-      "0px 4px 4px rgba(1, 101, 255, 0.2), inset 0px -4px 4px rgba(255, 255, 255, 0.2)",
-  }}
->
-  Keluar
-</button>
-
-{/* BUTTON BATAL */}
-<button
-  onClick={() => setShowLogoutPopup(false)}
-  className="
-    mt-4
-    w-[220.19px]
-    h-[36.72px]
-    rounded-[34px]
-    mx-auto
-    block
-    border
-    border-[#E5E7EB]
-    bg-white
-    text-[#1B2340]
-    text-[14px]
-    font-medium
+    absolute
+    bottom-8
+    left-6
+    right-6
+    h-[52px]
+    rounded-[12px]
+    border border-[#F2D5D5]
+    bg-[#FFF7F7]
+    flex
+    items-center
+    px-4
+    gap-3
   "
 >
-  Batal
-</button>
+  <img
+    src={IconLogout}
+    alt="Logout"
+    className="w-[38px] h-[38px]"
+  />
 
+  <span className="text-[#D63B35] font-semibold text-[16px]">
+    Keluar
+  </span>
+</button>
+      </div>
     </div>
   </div>
 )}

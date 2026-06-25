@@ -32,10 +32,19 @@ app.use(limiter);
 */
 
 app.use(helmet());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://smartwaterfe.l-prepaid.com",
+];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin: allowedOrigins,
   credentials: true,
 }));
+
+app.use(morgan('dev'));
 app.use(cors());
 app.use(morgan('dev'));
 

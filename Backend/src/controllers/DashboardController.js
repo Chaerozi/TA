@@ -147,14 +147,15 @@ console.log("currentYear =", currentYear);
     { x: "Feb", value: 0 },
     { x: "Mar", value: 0 },
     { x: "Apr", value: 0 },
-    { x: "May", value: 0 }
+    { x: "May", value: 0 },
+    { x: "Jun", value: 0 },
   ];
 
   const startDate =
     new Date(currentYear, 0, 1);
 
   const endDate =
-    new Date(currentYear, 4, 31, 23, 59, 59);
+    new Date(currentYear, 5, 30, 23, 59, 59);
 
   const usages =
   await prisma.waterUsage.findMany({
@@ -173,8 +174,8 @@ console.log("currentYear =", currentYear);
       new Date(item.timestamp)
         .getMonth();
 
-    // hanya Jan-Apr
-    if (month >= 0 && month <= 4) {
+    // hanya Jan-Jun
+    if (month >= 0 && month <= 5) {
 
       chart[month].value +=
         (item.volume)/1000 || 0;

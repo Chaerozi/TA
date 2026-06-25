@@ -8,17 +8,15 @@ export class AuthController {
   /**
    * REGISTER
    */
-  static async register(req, res) {
-
+    static async register(req, res) {
     try {
-
-      const { name, email, password } = req.body;
+      const { name, email, password, address, phone } = req.body;
 
       // Validasi input
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !address || !phone) {
         return res.status(400).json({
           success: false,
-          message: "Semua field wajib diisi",
+          message: 'Semua field wajib diisi',
         });
       }
 
@@ -32,43 +30,111 @@ export class AuthController {
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message: "Email sudah digunakan",
+          message: 'Email sudah digunakan',
         });
       }
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Simpan user
-      const user = await prisma.user.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
+      const currentYear = new Date().getFullYear();
+
+      const lastCustomer = await prisma.user.findFirst({
+        where: {
+          customer_number: {
+            startsWith: `CN-${currentYear}-`,
+          },
         },
+        orderBy: {
+          customer_number: 'desc',
+        },
+      });
+
+      let nextNumber = 1;
+
+      if (lastCustomer?.customer_number) {
+        nextNumber = parseInt(lastCustomer.customer_number.split('-')[2]) + 1;
+      }
+
+      const customerNumber = `CN-${currentYear}-${String(nextNumber).padStart(5, '0')}`;
+
+      let sensorName = 'Sensor X';
+
+      const unitMatch = address.match(/unit\s+([^,]+)/i);
+
+      if (unitMatch) {
+        const unitText = unitMatch[1].trim();
+
+        sensorName = `Sensor Unit ${unitText}`;
+      }
+
+      const lastUser = await prisma.user.findFirst({
+        where: {
+          id: {
+            startsWith: 'P',
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
+
+      let nextUserNumber = 1;
+
+      if (lastUser?.id && /^P\d+$/.test(lastUser.id)) {
+        nextUserNumber = parseInt(lastUser.id.substring(1)) + 1;
+      }
+
+      const userId = `P${String(nextUserNumber).padStart(4, '0')}`;
+
+      // Simpan user
+      const user = await prisma.$transaction(async (tx) => {
+        const newUser = await tx.user.create({
+          data: {
+            id: userId,
+            name,
+            email,
+            password: hashedPassword,
+            customer_number: customerNumber,
+            address,
+            phone,
+            role: 'user',
+          },
+        });
+
+        await tx.device.create({
+          data: {
+            id: crypto.randomUUID(),
+            userId: newUser.id,
+            name: sensorName,
+            location: address,
+            status: 'Active',
+          },
+        });
+
+        return newUser;
       });
 
       return res.status(201).json({
         success: true,
-        message: "Register berhasil",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
+        message: 'Register berhasil',
+       data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        customer_number: user.customer_number,
+        address: user.address,
+        phone: user.phone,
+      },
       });
-
     } catch (error) {
-
       console.error(error);
 
       return res.status(500).json({
         success: false,
-        message: "Server error",
+        message: 'Server error',
       });
-
     }
-
   }
 
   /**
@@ -118,27 +184,32 @@ export class AuthController {
       }
 
       // Generate JWT token
-      const token = jwt.sign(
-        {
-          id: user.id,
-          email: user.email,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
-      );
+const token = jwt.sign(
+  {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "1d",
+  }
+);
 
-      return res.status(200).json({
-        success: true,
-        message: "Login berhasil",
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      });
+return res.status(200).json({
+  success: true,
+  message: "Login berhasil",
+  token,
+user: {
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  customer_number: user.customer_number,
+  address: user.address,
+  phone: user.phone,
+},
+});
 
     } catch (error) {
 
@@ -173,15 +244,17 @@ export class AuthController {
         });
       }
 
-      return res.status(200).json({
-        success: true,
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      });
-
+ return res.status(200).json({
+  success: true,
+  data: {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    customer_number: user.customer_number,
+    address: user.address,
+    phone: user.phone,
+  },
+});
     } catch (error) {
 
       console.error(error);

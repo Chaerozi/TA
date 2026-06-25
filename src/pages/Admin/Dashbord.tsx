@@ -1,8 +1,15 @@
 import { useState, useRef, useEffect } from "react"
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell,
-} from "recharts"
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 import WaterChartAdmin from "../../components/WaterChartAdmin"
 
@@ -10,34 +17,9 @@ import totalIcon    from "../../assets/adminDasbord/Total.svg"
 import konsumsiIcon from "../../assets/adminDasbord/Konsumsi.svg"
 import bulanIcon    from "../../assets/adminDasbord/Bulan.svg"
 import kelolaIcon   from "../../assets/adminDasbord/Kelola.svg"
-import notifIcon    from "../../assets/adminDasbord/Lonceng.svg"
 import Berhasil     from "../../assets/adminDasbord/Berhasil.svg"
 
 /* ===================== DATA ===================== */
-const barData = {
-  "1 Bulan Terakhir": [
-    { month: "Jan", values: [10000, 3000, 1200, 100] },
-  ],
-  "3 Bulan Terakhir": [
-    { month: "Jan", values: [10000, 3000, 1200, 100] },
-    { month: "Feb", values: [10000, 1200, 600, 300] },
-    { month: "Mar", values: [900, 600, 1200, 3000] },
-  ],
-  "6 Bulan Terakhir": [
-    { month: "Jan", values: [10000, 3000, 1200, 100] },
-    { month: "Feb", values: [10000, 1200, 600, 300] },
-    { month: "Mar", values: [900, 600, 1200, 3000] },
-    { month: "Apr", values: [600, 900, 5200, 3000] },
-    { month: "May", values: [3000, 1200, 5200, 3000] },
-    { month: "Jun", values: [1200, 3000, 1000, 2800] },
-  ],
-}
-
-const RANGE_OPTIONS = ["1 Minggu Terakhir", "1 Bulan Terakhir"] as const
-type RangeType = typeof RANGE_OPTIONS[number]
-
-
-const UNIT_LIST = ["Unit A-10", "Unit A-11", "Unit A-12", "Unit B-01", "Unit B-02", "Unit C-05"]
 
 type FilterType = "All" | "Lunas" | "Belum Dibayar"
 
@@ -106,14 +88,7 @@ export default function Dashboard() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
 
 const [waterPrice, setWaterPrice] = useState("")
-
-const [range, setRange] = useState<RangeType>("1 Minggu Terakhir")
   
-  
-
-  const [rangeOpen, setRangeOpen] = useState(false)
-  const rangeRef = useRef<HTMLDivElement>(null)
-
   const [paymentSearch, setPaymentSearch] = useState("")
   const [filterStatus, setFilterStatus]   = useState<FilterType>("All")
   const [filterOpen, setFilterOpen]       = useState(false)
@@ -218,12 +193,19 @@ setPaidPercentage(
 
   fetchAdminStats();
 
-    function handler(e: MouseEvent) {
-      if (rangeRef.current  && !rangeRef.current.contains(e.target as Node))  setRangeOpen(false)
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFilterOpen(false)
-    }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
+function handler(e: MouseEvent) {
+  if (
+    filterRef.current &&
+    !filterRef.current.contains(e.target as Node)
+  ) {
+    setFilterOpen(false)
+  }
+}
+
+document.addEventListener("mousedown", handler)
+
+return () =>
+  document.removeEventListener("mousedown", handler)
   }, [])
   const [usageDifference, setUsageDifference] =
   useState(0);
@@ -250,20 +232,15 @@ useEffect(() => {
       const token =
         localStorage.getItem("token");
 
-      const chartRange =
-  range === "1 Minggu Terakhir"
-    ? "week"
-    : "month";
-
+ 
 const response = await fetch(
-  `http://localhost:3000/api/v1/admin/usage-chart?range=${chartRange}`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`
-            }
-          }
-        );
+  "http://localhost:3000/api/v1/admin/usage-chart?range=week",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       const result =
         await response.json();
@@ -280,7 +257,7 @@ const response = await fetch(
 
   fetchUsageChart();
 
-}, [range]);
+}, []);
 const usageBadge =
   `${usageDifference >= 0 ? "+" : ""}${(usageDifference/1000).toFixed(1)} m³`;
 
@@ -637,27 +614,7 @@ const paginatedPayments =
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-[15px] font-bold text-gray-800">Volume pemakaian air</h3>
 
-              <div className="relative" ref={rangeRef}>
-                <button
-                  onClick={() => setRangeOpen(!rangeOpen)}
-                  className="flex items-center gap-2 text-[12px] font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 h-[32px] rounded-[10px] transition"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                  {range}
-                </button>
-                {rangeOpen && (
-                  <div className="absolute right-0 top-[38px] w-[180px] bg-white rounded-[14px] shadow-lg border border-gray-100 p-1.5 z-50">
-                    {RANGE_OPTIONS.map(r => (
-                      <button key={r} onClick={() => { setRange(r); setRangeOpen(false) }}
-                        className={`w-full text-left px-3 py-2.5 text-[12px] rounded-[10px] transition font-medium ${range === r ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}>
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              
             </div>
 
             <div className="relative" style={{ height: "360px" }}>
@@ -716,6 +673,7 @@ const paginatedPayments =
               <thead>
                 <tr className="bg-gray-50/80">
                   <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3 px-5">ID</th>
+                  <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3 pr-5">Tanggal</th>
                   <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3">Pemakaian</th>
                   <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3">Status</th>
                   <th className="text-left text-[11px] text-gray-400 font-semibold uppercase tracking-wide py-3 pr-5">Tagihan</th>
@@ -723,37 +681,41 @@ const paginatedPayments =
               </thead>
             <tbody>
   {paginatedPayments.length > 0 ? paginatedPayments.map((row, i) => (
-    <tr
-      key={i}
-      className="border-t border-gray-50 hover:bg-blue-50/30 transition cursor-default"
+   <tr
+  key={i}
+  className="border-t border-gray-50 hover:bg-blue-50/30 transition cursor-default"
+>
+  <td className="py-3.5 px-5 text-[13px] font-semibold text-gray-800">
+    {row.id}
+  </td>
+
+  <td className="py-3.5 text-[13px] text-gray-500">
+    {row.tanggal}
+  </td>
+
+  <td className="py-3.5 text-[13px] text-gray-500">
+    {row.pemakaian}
+  </td>
+
+  <td className="py-3.5">
+    <span
+      className={`text-[11px] font-semibold px-3 py-1 rounded-full ${
+        row.status === "Lunas"
+          ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
+          : "text-rose-500 bg-rose-50 border border-rose-100"
+      }`}
     >
-      <td className="py-3.5 px-5 text-[13px] font-semibold text-gray-800">
-        {row.id}
-      </td>
+      {row.status}
+    </span>
+  </td>
 
-      <td className="py-3.5 text-[13px] text-gray-500">
-        {row.pemakaian}
-      </td>
-
-      <td className="py-3.5">
-        <span
-          className={`text-[11px] font-semibold px-3 py-1 rounded-full ${
-            row.status === "Lunas"
-              ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
-              : "text-rose-500 bg-rose-50 border border-rose-100"
-          }`}
-        >
-          {row.status}
-        </span>
-      </td>
-
-      <td className="py-3.5 pr-5 text-[13px] text-gray-500 font-medium">
-        {row.tagihan}
-      </td>
-    </tr>
+  <td className="py-3.5 pr-5 text-[13px] text-gray-500 font-medium">
+    {row.tagihan}
+  </td>
+</tr>
   )) : (
                   <tr>
-                    <td colSpan={4} className="py-8 text-center text-[13px] text-gray-400">Tidak ada data yang cocok</td>
+                    <td colSpan={5} className="py-8 text-center text-[13px] text-gray-400">Tidak ada data yang cocok</td>
                   </tr>
                 )}
               </tbody>

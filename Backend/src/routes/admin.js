@@ -26,6 +26,11 @@ router.get(
   AdminController.getMonitoringUnits
 );
 
+router.delete(
+  "/monitoring-units/:id",
+  AdminController.deleteMonitoringUnit
+);
+
 router.get(
   "/billing-stats",
   AdminController.getBillingStats
